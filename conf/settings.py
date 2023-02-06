@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'debug_toolbar', #debuger
     "phonenumber_field", #get phone number
+    "django_json_widget"
 ]
 
 MIDDLEWARE = [

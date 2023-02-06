@@ -16,23 +16,15 @@ class User(models.Model):
 
 class Category(models.Model):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='parent_category', null=True, blank=True)
-    # name = models.CharField(max_length=200)
     name = models.JSONField()
 
-    # def __str__(self):
-    #     return self.name
     
-
 class Product(models.Model):
     user = models.ForeignKey(User, related_name='user', on_delete=models.CASCADE, null=True, blank=True)
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
-    image = models.ImageField(upload_to='products/%Y/%b/%d/', null=False, blank=True)
+    image = models.ImageField(upload_to='products', null=False, blank=True)
     description = models.TextField()
     price = models.IntegerField()
-    status = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name

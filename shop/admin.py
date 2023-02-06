@@ -1,5 +1,8 @@
 from django.contrib import admin
 from .models import User, Category, Product
+from django.contrib.postgres import fields
+from django_json_widget.widgets import JSONEditorWidget
+
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
@@ -7,19 +10,17 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('id', 'name',)
+    raw_id_fields = ('parent',)
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'status', 'user')
-    list_filter = ('status', 'created')
-    list_editable = ('price', 'status')
     raw_id_fields = ('category',)
-    actions = ('change_status',)
+    list_display = ('name', 'price', 'user')
+    list_filter = ('category__id','user')
+    search_fields = ('category__name','name','user','price')
 
-    @admin.action(description='change status of model')
-    def change_status(self, request, queryset):
-        rows_count = queryset.update(status=True)
-        self.message_user(request, f'{rows_count} status has changed')
+
+    
         
