@@ -16,7 +16,7 @@ class User(models.Model):
 
 class Category(models.Model):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='parent_category', null=True, blank=True)
-    name = models.JSONField()
+    name = models.JSONField() #models.CharField(max_length=2000) #
 
     
 class Product(models.Model):

@@ -11,7 +11,7 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name',)
-    raw_id_fields = ('parent',)
+    # raw_id_fields = ('parent',)
 
 
 @admin.register(Product)

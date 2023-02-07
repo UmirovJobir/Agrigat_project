@@ -23,6 +23,6 @@ class CategorySerializer(serializers.ModelSerializer):
     def category_name(self, category):
         lan = self.context.get("lan")
         name = category.name
-        print(lan)
+        print(name.get(lan))
         return name.get(lan)
         
