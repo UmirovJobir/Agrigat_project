@@ -18,8 +18,7 @@ python3 manage.py makemigrations
 python3 manage.py migrate
 
 echo "initadmin"
-python3 create_admin.py
-
+python3 manage.py create_admin
 
 echo "Starting server"
 python3 manage.py runserver --insecure 0.0.0.0:8000
