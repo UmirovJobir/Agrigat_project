@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  django:
+    build: .
+    container_name: django
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - pgdb
+    env_file:
+      - .env
+
+
+  pgdb:
+    image: postgres:11
+    container_name: pgdb
+    environment:
+      - POSTGRES_DB=HR_Agrozamin
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_HOST=pgdb
+      - POSTGRES_PORT=5432
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
+  pgadmin:
+      image: dpage/pgadmin4
+      container_name: pgadmin
+      depends_on:
+        - pgdb
+      ports:
+        - "8080:80"
+      environment:
+        PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+        PGADMIN_DEFAULT_PASSWORD: root
+      restart: always
+
+volumes:
+    django:
+    pgdb:
