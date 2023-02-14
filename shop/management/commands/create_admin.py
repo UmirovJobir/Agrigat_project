@@ -18,3 +18,4 @@ class Command(BaseCommand):
         else:
             self.stdout.write('Admin accounts can only be initialized if no Accounts exist')
 
+
