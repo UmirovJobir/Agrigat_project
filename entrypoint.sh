@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-if [ "$DATABASE" = "HR_Agrozamin" ]
+if [ "$DATABASE" = "Agrigat" ]
 then
     echo "Waiting for postgres..."
 

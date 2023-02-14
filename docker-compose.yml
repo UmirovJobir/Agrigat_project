@@ -18,7 +18,7 @@ services:
     image: postgres:11
     container_name: pgdb
     environment:
-      - POSTGRES_DB=HR_Agrozamin
+      - POSTGRES_DB=Agrigat
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=123
       - POSTGRES_HOST=pgdb
