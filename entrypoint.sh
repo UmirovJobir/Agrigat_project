@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 if [ "$DATABASE" = "Agrigat" ]
 then
     echo "Waiting for postgres..."
