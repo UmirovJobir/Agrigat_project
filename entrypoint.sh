@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$DATABASE" = "Agrigat" ]
+if [ "$DATABASE" = "Agrigate" ]
 then
     echo "Waiting for postgres..."
 
