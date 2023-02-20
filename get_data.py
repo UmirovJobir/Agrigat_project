@@ -6,7 +6,7 @@ import pandas as pd
 from shop.models import Category
 
 
-# file = 'cat_rel.xlsx'
+file = 'cat_rel.xlsx'
 # file = 'cat_07_02.xlsx'
 # file = 'category.txt'
 csv_file = 'mini.csv'

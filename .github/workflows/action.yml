@@ -14,7 +14,7 @@ jobs:
       with:
         host: 3.226.69.133
         USERNAME: ubuntu
-        key: ${{ secrets.UBUNTU_KEY }}
+        key: ${{ secrets.NEW_KEY }}
         PORT: 22
         script: |
           cd ~
