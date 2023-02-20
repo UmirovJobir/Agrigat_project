@@ -17,14 +17,14 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name',)
     # raw_id_fields = ('parent',)
 
-    change_list_template = "csv_apload.html"
+    # change_list_template = "csv_apload.html"
 
-    def get_urls(self):
-        urls = super().get_urls()
-        my_urls = [
-            path('import-csv/', self.import_csv),
-        ]
-        return my_urls + urls
+    # def get_urls(self):
+    #     urls = super().get_urls()
+    #     my_urls = [
+    #         path('import-csv/', self.import_csv),
+    #     ]
+    #     return my_urls + urls
 
 
 
