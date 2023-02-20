@@ -31,7 +31,7 @@ services:
       depends_on:
         - pgdb
       ports:
-        - "8080:80"
+        - "8080:81"
       environment:
         PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
         PGADMIN_DEFAULT_PASSWORD: root
