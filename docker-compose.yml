@@ -24,15 +24,20 @@ services:
       - POSTGRES_PORT=5432
     volumes:
       - ./data:/var/lib/postgresql/data
+    ports:
+        - "5432:5432"
 
   pgadmin:
       image: dpage/pgadmin4
       container_name: pgadmin
       depends_on:
         - pgdb
+      ports:
+        - "8080:80"
       environment:
         PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
         PGADMIN_DEFAULT_PASSWORD: ubuntu
+        PG_ADMIN_PORT: 8080
       restart: always
 
 volumes:
