@@ -14,7 +14,7 @@ services:
       - .env
 
   pgdb:
-    image: postgres:latest
+    image: postgres:11
     container_name: pgdb
     environment:
       - POSTGRES_DB=Agrigate
