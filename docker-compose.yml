@@ -20,8 +20,8 @@ services:
       - POSTGRES_DB=Agrigate
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=123
-    ports:
-      - "5432:5432"
+      - POSTGRES_HOST=pgdb
+      - POSTGRES_PORT=5432
     volumes:
       - ./data:/var/lib/postgresql/data
 
