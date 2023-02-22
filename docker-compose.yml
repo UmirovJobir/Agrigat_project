@@ -20,10 +20,10 @@ services:
       - POSTGRES_DB=Agrigate
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=123
-      - POSTGRES_HOST=pgdb
-      - POSTGRES_PORT=5432
     volumes:
       - ./data:/var/lib/postgresql/data
+    ports:
+      - 5434:5432
 
   pgadmin:
       image: dpage/pgadmin4:latest
@@ -33,7 +33,6 @@ services:
       environment:
         PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
         PGADMIN_DEFAULT_PASSWORD: ubuntu
-        # PGADMIN_LISTEN_PORT: 5050
       restart: always
       ports:
         - 5050:80
