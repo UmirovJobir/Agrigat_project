@@ -30,8 +30,6 @@ services:
       container_name: pgadmin
       depends_on:
         - pgdb
-      ports:
-        - "5050:5050"
       environment:
         PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
         PGADMIN_DEFAULT_PASSWORD: ubuntu
