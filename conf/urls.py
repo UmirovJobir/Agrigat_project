@@ -18,6 +18,9 @@ from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+from rest_framework.permissions import AllowAny
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,3 +31,18 @@ urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += [re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}),]
 if settings.DEBUG == True:
     urlpatterns += [path('__debug__/', include('debug_toolbar.urls'))]
+
+
+#Swagger
+schema_view = get_schema_view(
+    openapi.Info(
+        title= 'HR-Agrozamin',
+        default_version='v1',
+        description='Swagger docs for Rest API',
+    ),
+    public=True,
+    permission_classes=(AllowAny,)
+)
+urlpatterns += [
+    path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-docs'),
+]

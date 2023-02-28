@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Category, Product
+from .models import User, Category, Product, KeyWords
 from django.forms import forms
 from django.urls import path
 from django.shortcuts import render
@@ -9,12 +9,16 @@ from .models import Category
 import pandas as pd
 import json
 
+@admin.register(KeyWords)
+class KeyWordsAdmin(admin.ModelAdmin):
+    raw_id_fields = ('category',)
+
 class ExcelImportForm(forms.Form):
     excel_file = forms.FileField(label="Загрузить excel файл")
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'chat_id', 'link')
+    list_display = ('username', 'user_id', 'link')
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -68,9 +72,10 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     raw_id_fields = ('category',)
-    list_display = ('name', 'price', 'user')
-    list_filter = ('category__id','user')
-    search_fields = ('category__name','name','user','price')
+    list_display = ('product_user', 'message_text', 'media_file')
+    search_fields = ('category__name','message_text','product_user')
+
+
 
 
     

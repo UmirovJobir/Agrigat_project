@@ -8,9 +8,11 @@ from .views import (
     ProductView,
     ProductDetailView,
     UserView,
+    KeyWordsView
 )
 
 urlpatterns = [
+    path('keyword/', KeyWordsView.as_view()),
     path('user/', UserView.as_view()),
     path('category/', ParentCategoryView.as_view()),
     path('category/<int:pk>/', CategoryProductView.as_view()),
