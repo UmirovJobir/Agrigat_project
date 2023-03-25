@@ -77,11 +77,12 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('product_user', 'category', 
+    list_display = ('product_user', 
                     'group_id', 'group_name', 'group_link',
                     'message_id', 'message_text', 'media_file', 
                     'status')
     search_fields = ('product_user', 'category', 'message_text', 'status')
+    raw_id_fields   = 'category',
 
 
 

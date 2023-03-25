@@ -34,7 +34,7 @@ class ProductUser(models.Model):
 class Category(models.Model):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='parent_category', null=True, blank=True)
     name = models.JSONField(null=False, blank=False)
-
+    
     class Meta:
         verbose_name='Category'
         verbose_name_plural='Categories'
@@ -42,8 +42,9 @@ class Category(models.Model):
 
 class Product(models.Model):
     product_user = models.ForeignKey(ProductUser, related_name='user', on_delete=models.CASCADE, null=True, blank=True)
-    category = models.IntegerField()
-    group_id = models.BigIntegerField(unique=True)
+    # category = models.IntegerField()
+    category = models.ManyToManyField(Category, related_name='category', blank=True)
+    group_id = models.BigIntegerField()
     group_name = models.CharField(max_length=200)
     group_link = models.CharField(max_length=200, null=False, blank=False)
     message_id = models.BigIntegerField(unique=True)
