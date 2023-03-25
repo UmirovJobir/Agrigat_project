@@ -38,7 +38,6 @@ class UserView(APIView):
             status=status.HTTP_400_BAD_REQUEST
             )
 
-
 class ProductUserView(APIView):        
     def post(self, request):
         serializer = ProductUserSerializer(data=request.data)
@@ -86,13 +85,14 @@ class CategoryProductView(APIView):
     def get(self, request, pk: int):
         lan = request.META['HTTP_LAN']
         categories = Category.objects.filter(parent=pk)
+        print(categories)
         if len(categories)==0:
             products = Product.objects.filter(category=pk).select_related('category')
         else:
-            products = Product.objects.filter(category__in=categories).select_related('category')
+            products = Product.objects.filter(category__in=categories).select_related('product_user')
             if len(products)==0:
                 categories_in = Category.objects.filter(parent__in=categories)
-                products = Product.objects.filter(category__in=categories_in).select_related('category')
+                products = Product.objects.filter(category__in=categories_in).select_related('product_user')
         product_serializer = ProductSerializer(products, many=True)
         category_serializer = CategorySerializer(
             categories, 
