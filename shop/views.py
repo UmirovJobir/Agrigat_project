@@ -2,28 +2,22 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
+import json
 from .models import (
+    User,
+    ProductUser,
     Category, 
-    Product, 
-    User, 
+    Product,  
     KeyWords)
 from .serializers import (
+    UserSerializer,
+    ProductUserSerializer,
     CategorySerializer, 
     ProductSerializer, 
-    UserSerializer, 
-    KeyWordsSerializer)
+    KeyWordsSerializer,
+    KeyWordsPostSerializer,
+    )
 
-
-class KeyWordsView(APIView):
-    def get(self, request):
-        lan = request.META['HTTP_LAN']
-        key_words = KeyWords.objects.all()
-        serializer = KeyWordsSerializer(
-            key_words, 
-            many=True, 
-            context={'lan': lan}
-            )
-        return Response(serializer.data)
 
 class UserView(APIView):
     def get(self, request):
@@ -45,9 +39,35 @@ class UserView(APIView):
             )
 
 
+class ProductUserView(APIView):        
+    def post(self, request):
+        serializer = ProductUserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data, 
+                status=status.HTTP_201_CREATED
+            )
+        return Response(
+            serializer.errors, 
+            status=status.HTTP_400_BAD_REQUEST
+            )
+
+class ProductUserDetailView(APIView):
+    def get(self, request, pk):
+        product_user = get_object_or_404(ProductUser, user_id=pk)
+        serializer = ProductUserSerializer(product_user)
+        return Response(serializer.data)    
+
 class ParentCategoryView(APIView):
     def get(self, request):
-        lan = request.META['HTTP_LAN']
+        try:
+            lan = request.META['HTTP_LAN']
+        except:
+            return Response(
+            data={"error": "lan does not exist!"}, 
+            status=status.HTTP_400_BAD_REQUEST
+            )
         categories = Category.objects.filter(parent=None)
         products = Product.objects.all()
         category_serializer = CategorySerializer(
@@ -85,9 +105,91 @@ class CategoryProductView(APIView):
             "product_count":product_count,
             "products":product_serializer.data}
             )
-            
-        
+
+
+class KeyWordIDView(APIView):
+    def get(self, request, pk: int):
+        lan = request.META['HTTP_LAN']
+        key_words = KeyWords.objects.filter(category=pk)
+        serializer = KeyWordsSerializer(
+            key_words, 
+            many=True, 
+            context={'lan': lan}
+            )
+        data = serializer.data
+        data = json.loads(json.dumps(data))
+        response = []
+        for i in data:
+            if i['key_words'] != None:
+                response.append(i)
+        return Response(response)
+
+class KeyWordView(APIView):
+    def get(self, request):
+        lan = request.META['HTTP_LAN']
+        word = self.request.query_params.get("word")
+        key_words = KeyWords.objects.filter(key_words={lan:word})
+        serializer = KeyWordsSerializer(
+            key_words, 
+            many=True, 
+            context={'lan': lan}
+            )
+        data = serializer.data
+        data = json.loads(json.dumps(data))
+        response = []
+        for i in data:
+            if i['key_words'] != None:
+                response.append(i)
+        return Response(response)
+
+class KeyWordsView(APIView):
+    def get(self, request):
+        lan = request.META['HTTP_LAN']
+        key_words = KeyWords.objects.all()
+        serializer = KeyWordsSerializer(
+            key_words, 
+            many=True, 
+            context={'lan': lan}
+            )
+        data = serializer.data
+        data = json.loads(json.dumps(data))
+        response = []
+        for i in data:
+            if i['key_words'] != None:
+                response.append(i)
+        return Response(response)
+
+    def post(self, request):
+        try:
+            lan = request.META['HTTP_LAN']
+        except:
+            return Response(
+            data={"error": "lan does not exist!"}, 
+            status=status.HTTP_400_BAD_REQUEST
+            )
+        data = request.data
+        data = json.loads(json.dumps(data))
+        data['key_words'] = {lan:data['key_words']}
+        serializer = KeyWordsPostSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data, 
+                status=status.HTTP_201_CREATED
+            )
+        return Response(
+            serializer.errors, 
+            status=status.HTTP_400_BAD_REQUEST
+            )
+
+      
 class ProductView(APIView):
+    def get(self, request):
+        products = Product.objects.all()
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
+    
+
     def post(self, request):
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():

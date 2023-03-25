@@ -1,30 +1,36 @@
 from django.contrib import admin
-from .models import User, Category, Product, KeyWords
+from .models import User, Category, Product, KeyWords, ProductUser
 from django.forms import forms
 from django.urls import path
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
-from .models import Category
 import pandas as pd
 import json
 
+admin.site.site_header = "Agrigat"
+admin.site.site_title = "Agrigat bot portali"
+admin.site.index_title = "Agrigat bot portaliga xush kelibsiz"
+
 @admin.register(KeyWords)
 class KeyWordsAdmin(admin.ModelAdmin):
-    raw_id_fields = ('category',)
+    list_display = ('category', 'key_words')
 
 class ExcelImportForm(forms.Form):
     excel_file = forms.FileField(label="Загрузить excel файл")
 
+@admin.register(ProductUser)
+class ProductUserAdmin(admin.ModelAdmin):
+    list_display = 'user_id', 'user_name', 'user_link', 'phone_number'
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'user_id', 'link')
+    list_display = ('user_name', 'user_id')
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name',)
     search_fields = 'name',
-    # raw_id_fields = ('parent',)
 
     def get_urls(self):
         urls = super().get_urls()
@@ -71,9 +77,11 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    raw_id_fields = ('category',)
-    list_display = ('product_user', 'message_text', 'media_file')
-    search_fields = ('category__name','message_text','product_user')
+    list_display = ('product_user', 'category', 
+                    'group_id', 'group_name', 'group_link',
+                    'message_id', 'message_text', 'media_file', 
+                    'status')
+    search_fields = ('product_user', 'category', 'message_text', 'status')
 
 
 
