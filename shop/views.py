@@ -87,7 +87,7 @@ class CategoryProductView(APIView):
         categories = Category.objects.filter(parent=pk)
         print(categories)
         if len(categories)==0:
-            products = Product.objects.filter(category=pk).select_related('category')
+            products = Product.objects.filter(category=pk).select_related('product_user')
         else:
             products = Product.objects.filter(category__in=categories).select_related('product_user')
             if len(products)==0:
