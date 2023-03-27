@@ -1,6 +1,6 @@
 name: Second Server Deploy
 
-# on: [push]
+on: [push]
 
 jobs:
   build:
