@@ -48,7 +48,7 @@ class CategoryAdmin(admin.ModelAdmin):
                 df = pd.read_excel(excel_file)
                 count = 0
                 for i in df.values:
-                    Category.objects.create(id=i[0], name=json.loads(i[1]), parent=i[3])
+                    Category.objects.create(id=i[0], name=json.loads(i[1]), parent=i[2])
                     count += 1
                 messages.info(request,f"{count} data added!")
             else:
