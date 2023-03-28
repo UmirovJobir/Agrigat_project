@@ -17,6 +17,9 @@ class ProductUserSerializer(serializers.ModelSerializer):
         fields = 'id', 'user_id', 'user_name', 'user_link', 'phone_number'
 
 class ProductSerializer(serializers.ModelSerializer):
+    product_user = ProductUserSerializer()
+    category = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
     class Meta:
         model = Product
         fields = [
@@ -25,6 +28,19 @@ class ProductSerializer(serializers.ModelSerializer):
             'message_id', 'message_text', 'media_file', 
             'datatime', 'status'
         ]
+
+    # Custom ProductUser()
+    def create(self, validated_data):
+        product_user_data = validated_data.get("product_user")
+
+        product_user, created = ProductUser.objects.get_or_create(**product_user_data)
+        
+        product = Product.objects.create(product_user=product_user, **product_user_data)            
+
+        return product_user
+
+
+
 
 
 class CategorySerializer(serializers.ModelSerializer):

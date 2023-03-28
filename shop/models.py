@@ -18,7 +18,7 @@ class User(models.Model):
 
 
 class ProductUser(models.Model):
-    user_id = models.BigIntegerField(unique=True)
+    user_id = models.BigIntegerField() #unique=True)
     user_name = models.CharField(max_length=100)
     user_link = models.CharField(max_length=100, null=True, blank=True)
     phone_number = PhoneNumberField(null=True, blank=True)
@@ -41,7 +41,7 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    product_user = models.ForeignKey(ProductUser, related_name='user', on_delete=models.CASCADE, null=True, blank=True)
+    product_user = models.ForeignKey(ProductUser, related_name='product_user', on_delete=models.CASCADE, null=True, blank=True)
     category = models.ManyToManyField(Category, related_name='category', blank=True)
     group_id = models.BigIntegerField()
     group_name = models.CharField(max_length=200)

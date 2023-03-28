@@ -191,17 +191,20 @@ class ProductView(APIView):
     
 
     def post(self, request):
+        # product_user = request.data['product_user']
+        # product_user, created = ProductUser.objects.get_or_create(
+        #     user_id=product_user["user_id"],
+        #     user_name=product_user["user_name"],
+        #     user_link=product_user["user_link"],
+        #     phone_number=product_user["phone_number"]
+        #     )
+        # print(product_user.)
+        # request.data['product_user'] = product_user
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(
-                serializer.data, 
-                status=status.HTTP_201_CREATED
-                )
-        return Response(
-            serializer.errors, 
-            status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ProductDetailView(APIView):
     def get(self, request, pk):
