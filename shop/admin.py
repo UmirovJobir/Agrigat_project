@@ -30,7 +30,8 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name',)
-    search_fields = 'name',
+    search_fields = 'id', 'name',
+    raw_id_fields = 'parent',
 
     def get_urls(self):
         urls = super().get_urls()
@@ -47,7 +48,7 @@ class CategoryAdmin(admin.ModelAdmin):
                 df = pd.read_excel(excel_file)
                 count = 0
                 for i in df.values:
-                    Category.objects.create(id=i[0], name=json.loads(i[1]))
+                    Category.objects.create(id=i[0], name=json.loads(i[1]), parent=i[3])
                     count += 1
                 messages.info(request,f"{count} data added!")
             else:

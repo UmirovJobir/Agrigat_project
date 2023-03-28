@@ -77,7 +77,7 @@ class ParentCategoryView(APIView):
         product_serializer = ProductSerializer(products, many=True)
         return Response(data={
             "categories":category_serializer.data, 
-            "products":product_serializer.data}
+            "products":product_serializer.data,}
             )
 
 
