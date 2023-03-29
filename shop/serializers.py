@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Product, User, KeyWords
+from .models import Category, Product, User, KeyWords, ProductUser
 
     
 class UserSerializer(serializers.ModelSerializer):
@@ -23,6 +23,12 @@ class CategorySerializer(serializers.ModelSerializer):
         lan = self.context.get("lan")
         name = category.name
         return name.get(lan)
+
+class ProductUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductUser
+        fields = 'id', 'user_id', 'user_name', 'user_link', 'phone_number'
+
 
 class ProductSerializer(serializers.ModelSerializer):
     product_user = ProductUserSerializer()

@@ -1,9 +1,8 @@
 from django.contrib import admin
-from .models import User, Category, Product, KeyWords
+from .models import User, Category, Product, KeyWords, ProductUser
 from django.forms import forms
 from django.urls import path
 from django.shortcuts import render
-from django.shortcuts import get_object_or_404
 from django.contrib import messages
 import pandas as pd
 import json
@@ -22,6 +21,13 @@ class ExcelImportForm(forms.Form):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('user_name', 'user_id')
+
+
+@admin.register(ProductUser)
+class ProductUserAdmin(admin.ModelAdmin):
+    list_display = 'id', 'user_id', 'user_name', 'user_link', 'phone_number'
+    list_display_links = 'user_id', 'user_name'
+
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -85,6 +91,7 @@ class ProductAdmin(admin.ModelAdmin):
     )
     search_fields = ('user_id', 'product_user', 'category', 'message_text', 'status')
     raw_id_fields   = 'category',
+    list_display_links = 'group_id',
 
 
 
