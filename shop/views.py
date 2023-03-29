@@ -64,7 +64,6 @@ class CategoryProductView(APIView):
     def get(self, request, pk: int):
         lan = request.META['HTTP_LAN']
         categories = Category.objects.filter(parent=pk)
-        print(categories)
         if len(categories)==0:
             products = Product.objects.filter(category=pk) #.select_related('product_user')
         else:
@@ -174,14 +173,9 @@ class ProductView(APIView):
         print(request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(
-                serializer.data, 
-                status=status.HTTP_201_CREATED
-                )
-        return Response(
-            serializer.errors, 
-            status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
 
 class ProductDetailView(APIView):
     def get(self, request, pk):

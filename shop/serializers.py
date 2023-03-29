@@ -12,15 +12,6 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
 
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = [
-            'id', 'user_id', 'user_name', 'user_link', 'category', 'group_id', 
-            'group_name', 'group_link', 'message_id', 'message_text', 'media_file', 'datatime', 'status'
-        ]
-
-
 class CategorySerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField("category_name")
 
@@ -33,6 +24,30 @@ class CategorySerializer(serializers.ModelSerializer):
         name = category.name
         return name.get(lan)
 
+class ProductSerializer(serializers.ModelSerializer):
+    product_user = ProductUserSerializer()
+
+    class Meta:
+        model = Product
+        fields = [
+            'id', 'product_user', 'category', 
+            'group_id', 'group_name', 'group_link',
+            'message_id', 'message_text', 'media_file', 
+            'datatime', 'status'
+        ]
+
+    def create(self, validated_data):
+        product_user_data = validated_data.pop("product_user")
+        category_data = validated_data.pop("category")
+
+        product_user, created = ProductUser.objects.get_or_create(**product_user_data)
+        
+        product = Product.objects.create(product_user=product_user, **validated_data)   
+
+        for category_d in category_data:
+            product.category.add(category_d)
+
+        return product
 
 class KeyWordsPostSerializer(serializers.ModelSerializer):
     class Meta:
