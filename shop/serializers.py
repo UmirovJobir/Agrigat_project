@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Product, User, ProductUser, KeyWords
+from .models import Category, Product, User, KeyWords
 
     
 class UserSerializer(serializers.ModelSerializer):
@@ -11,19 +11,13 @@ class UserSerializer(serializers.ModelSerializer):
             'phone_number'
         ]
 
-class ProductUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductUser
-        fields = 'id', 'user_id', 'user_name', 'user_link', 'phone_number'
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            'id', 'product_user', 'category', 
-            'group_id', 'group_name', 'group_link',
-            'message_id', 'message_text', 'media_file', 
-            'datatime', 'status'
+            'id', 'user_id', 'user_name', 'user_link', 'category', 'group_id', 
+            'group_name', 'group_link', 'message_id', 'message_text', 'media_file', 'datatime', 'status'
         ]
 
 

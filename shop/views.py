@@ -5,13 +5,11 @@ from rest_framework.response import Response
 import json
 from .models import (
     User,
-    ProductUser,
     Category, 
     Product,  
     KeyWords)
 from .serializers import (
     UserSerializer,
-    ProductUserSerializer,
     CategorySerializer, 
     ProductSerializer, 
     KeyWordsSerializer,
@@ -38,25 +36,6 @@ class UserView(APIView):
             status=status.HTTP_400_BAD_REQUEST
             )
 
-class ProductUserView(APIView):        
-    def post(self, request):
-        serializer = ProductUserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                serializer.data, 
-                status=status.HTTP_201_CREATED
-            )
-        return Response(
-            serializer.errors, 
-            status=status.HTTP_400_BAD_REQUEST
-            )
-
-class ProductUserDetailView(APIView):
-    def get(self, request, pk):
-        product_user = get_object_or_404(ProductUser, user_id=pk)
-        serializer = ProductUserSerializer(product_user)
-        return Response(serializer.data)    
 
 class ParentCategoryView(APIView):
     def get(self, request):
@@ -192,6 +171,7 @@ class ProductView(APIView):
 
     def post(self, request):
         serializer = ProductSerializer(data=request.data)
+        print(request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(

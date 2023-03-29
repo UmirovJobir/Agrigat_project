@@ -17,20 +17,6 @@ class User(models.Model):
         verbose_name_plural='Bot users'
 
 
-class ProductUser(models.Model):
-    user_id = models.BigIntegerField(unique=True)
-    user_name = models.CharField(max_length=100)
-    user_link = models.CharField(max_length=100, null=True, blank=True)
-    phone_number = PhoneNumberField(null=True, blank=True)
-
-    def __str__(self):
-        return self.user_name
-    
-    class Meta:
-        verbose_name='Product user'
-        verbose_name_plural='Product users'
-
-
 class Category(models.Model):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='parent_category', null=True, blank=True)
     name = models.JSONField(null=False, blank=False)
@@ -41,7 +27,9 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    product_user = models.ForeignKey(ProductUser, related_name='user', on_delete=models.CASCADE, null=True, blank=True)
+    user_id = models.BigIntegerField()
+    user_name = models.CharField(max_length=100)
+    user_link = models.CharField(max_length=100, null=True, blank=True)    
     category = models.ManyToManyField(Category, related_name='category', blank=True)
     group_id = models.BigIntegerField()
     group_name = models.CharField(max_length=200)
