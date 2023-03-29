@@ -68,10 +68,10 @@ class CategoryProductView(APIView):
         if len(categories)==0:
             products = Product.objects.filter(category=pk).select_related('product_user')
         else:
-            products = Product.objects.filter(category__in=categories).select_related('product_user')
+            products = Product.objects.filter(category__in=categories) #.select_related('product_user')
             if len(products)==0:
                 categories_in = Category.objects.filter(parent__in=categories)
-                products = Product.objects.filter(category__in=categories_in).select_related('product_user')
+                products = Product.objects.filter(category__in=categories_in) #.select_related('product_user')
         product_serializer = ProductSerializer(products, many=True)
         category_serializer = CategorySerializer(
             categories, 

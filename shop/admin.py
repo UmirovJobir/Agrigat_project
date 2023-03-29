@@ -25,7 +25,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'parent')
+    list_display = ('id', 'name',)
     search_fields = 'id', 'name',
     raw_id_fields = 'parent',
 
@@ -42,15 +42,9 @@ class CategoryAdmin(admin.ModelAdmin):
             excel_file = request.FILES["excel_file"]
             if excel_file.name.endswith('.xlsx'):
                 df = pd.read_excel(excel_file)
-                df = df.fillna('-')
                 count = 0
                 for i in df.values:
-                    if i[2] !='-':
-                        print(i[0], i[1], int(i[2]))
-                        parent_id = Category.objects.get(id=int(i[2]))
-                        Category.objects.get_or_create(id=i[0], name=json.loads(i[1]), parent=parent_id)
-                    else:
-                        Category.objects.get_or_create(id=i[0], name=json.loads(i[1]))
+                    Category.objects.create(id=i[0], name=json.loads(i[1]))
                     count += 1
                 messages.info(request,f"{count} data added!")
             else:
