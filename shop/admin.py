@@ -29,7 +29,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name',)
+    list_display = ('id', 'name', 'parent')
     search_fields = 'id', 'name',
     raw_id_fields = 'parent',
 
@@ -48,7 +48,7 @@ class CategoryAdmin(admin.ModelAdmin):
                 df = pd.read_excel(excel_file)
                 count = 0
                 for i in df.values:
-                    Category.objects.create(id=i[0], name=json.loads(i[1]), parent=i[2])
+                    Category.objects.create(id=i[0], name=json.loads(i[1]))
                     count += 1
                 messages.info(request,f"{count} data added!")
             else:
@@ -63,12 +63,17 @@ class CategoryAdmin(admin.ModelAdmin):
             if excel_file.name.endswith('.xlsx'):
                 df = pd.read_excel(excel_file)
                 count = 0
+                notfound = 0
                 for i in df.values:
-                    category = get_object_or_404(Category, id=i[1])
-                    category.parent = get_object_or_404(Category, id=i[0])
-                    category.save()
-                    count += 1
+                    try:
+                        category = Category.objects.get(id=i[1])
+                        category.parent = Category.objects.get(id=i[0])
+                        category.save()
+                        count += 1
+                    except Category.DoesNotExist:
+                        notfound += 1
                 messages.info(request,f"{count} data changed!")
+                messages.warning(request, f"{notfound} category not found!")
             else:
                 messages.error(request,"File is not in .xslx format!")
         form = ExcelImportForm()
