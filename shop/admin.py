@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Category, Product, KeyWords, ProductUser
+from .models import User, Category, Product, KeyWords
 from django.forms import forms
 from django.urls import path
 from django.shortcuts import render
@@ -19,10 +19,6 @@ class KeyWordsAdmin(admin.ModelAdmin):
 class ExcelImportForm(forms.Form):
     excel_file = forms.FileField(label="Загрузить excel файл")
 
-@admin.register(ProductUser)
-class ProductUserAdmin(admin.ModelAdmin):
-    list_display = 'user_id', 'user_name', 'user_link', 'phone_number'
-
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('user_name', 'user_id')
@@ -36,8 +32,8 @@ class CategoryAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
         new_url = [
-            path('upload-excel/',self.upload_excel),
-            path('change-parent-id/',self.change_parent_id)
+            path('change-parent-id/', self.change_parent_id),
+            path('upload-excel/', self.upload_excel),   
         ]
         return new_url + urls
 
@@ -83,11 +79,11 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('product_user', 
-                    'group_id', 'group_name', 'group_link',
-                    'message_id', 'message_text', 'media_file', 
-                    'status')
-    search_fields = ('product_user', 'category', 'message_text', 'status')
+    list_display = (
+        'id',  'group_id', 'group_name', 'group_link', 'message_id', 
+        'message_text', 'media_file', 'datatime', 'status'
+    )
+    search_fields = ('user_id', 'product_user', 'category', 'message_text', 'status')
     raw_id_fields   = 'category',
 
 

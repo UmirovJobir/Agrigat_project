@@ -18,7 +18,7 @@ class User(models.Model):
 
 
 class ProductUser(models.Model):
-    user_id = models.BigIntegerField() #unique=True)
+    user_id = models.BigIntegerField(unique=True)
     user_name = models.CharField(max_length=100)
     user_link = models.CharField(max_length=100, null=True, blank=True)
     phone_number = PhoneNumberField(null=True, blank=True)

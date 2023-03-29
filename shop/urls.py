@@ -4,8 +4,6 @@ from django.conf import settings
 
 from .views import (
     UserView,
-    ProductUserView,
-    ProductUserDetailView,
     ParentCategoryView, 
     CategoryProductView,
     ProductView,
@@ -17,9 +15,6 @@ from .views import (
 urlpatterns = [
     path('user/', UserView.as_view()),
     
-    path('product_user/', ProductUserView.as_view()),
-    path('product_user/<int:pk>/', ProductUserDetailView.as_view()),
-
     path('keywords/', KeyWordsView.as_view()),
     path('keyword/', KeyWordView.as_view()),
     path('keyword/<int:pk>/', KeyWordView.as_view()),

@@ -5,13 +5,11 @@ from rest_framework.response import Response
 import json
 from .models import (
     User,
-    ProductUser,
     Category, 
     Product,  
     KeyWords)
 from .serializers import (
     UserSerializer,
-    ProductUserSerializer,
     CategorySerializer, 
     ProductSerializer, 
     KeyWordsSerializer,
@@ -38,25 +36,6 @@ class UserView(APIView):
             status=status.HTTP_400_BAD_REQUEST
             )
 
-class ProductUserView(APIView):        
-    def post(self, request):
-        serializer = ProductUserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                serializer.data, 
-                status=status.HTTP_201_CREATED
-            )
-        return Response(
-            serializer.errors, 
-            status=status.HTTP_400_BAD_REQUEST
-            )
-
-class ProductUserDetailView(APIView):
-    def get(self, request, pk):
-        product_user = get_object_or_404(ProductUser, user_id=pk)
-        serializer = ProductUserSerializer(product_user)
-        return Response(serializer.data)    
 
 class ParentCategoryView(APIView):
     def get(self, request):
@@ -86,12 +65,12 @@ class CategoryProductView(APIView):
         lan = request.META['HTTP_LAN']
         categories = Category.objects.filter(parent=pk)
         if len(categories)==0:
-            products = Product.objects.filter(category=pk).select_related('product_user')
+            products = Product.objects.filter(category=pk) #.select_related('product_user')
         else:
-            products = Product.objects.filter(category__in=categories).select_related('product_user')
+            products = Product.objects.filter(category__in=categories) #.select_related('product_user')
             if len(products)==0:
                 categories_in = Category.objects.filter(parent__in=categories)
-                products = Product.objects.filter(category__in=categories_in).select_related('product_user')
+                products = Product.objects.filter(category__in=categories_in) #.select_related('product_user')
         product_serializer = ProductSerializer(products, many=True)
         category_serializer = CategorySerializer(
             categories, 
@@ -191,6 +170,7 @@ class ProductView(APIView):
 
     def post(self, request):
         serializer = ProductSerializer(data=request.data)
+        print(request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
