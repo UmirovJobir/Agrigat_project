@@ -25,15 +25,15 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name',)
+    list_display = ('id', 'name', 'parent')
     search_fields = 'id', 'name',
     raw_id_fields = 'parent',
 
     def get_urls(self):
         urls = super().get_urls()
         new_url = [
-            path('upload-excel/',self.upload_excel),
-            path('change-parent-id/',self.change_parent_id)
+            path('change-parent-id/', self.change_parent_id),
+            path('upload-excel/', self.upload_excel),   
         ]
         return new_url + urls
 
