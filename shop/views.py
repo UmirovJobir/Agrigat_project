@@ -85,7 +85,6 @@ class CategoryProductView(APIView):
     def get(self, request, pk: int):
         lan = request.META['HTTP_LAN']
         categories = Category.objects.filter(parent=pk)
-        print(categories)
         if len(categories)==0:
             products = Product.objects.filter(category=pk).select_related('product_user')
         else:
