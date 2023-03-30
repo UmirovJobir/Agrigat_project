@@ -45,17 +45,25 @@ class ProductUserView(APIView):
         return Response(serializer.data)
         
     def post(self, request):
-        serializer = ProductUserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
+        user_id = request.data["user_id"]
+        try:
+            ProductUser.objects.get(user_id = user_id)
             return Response(
-                serializer.data, 
-                status=status.HTTP_201_CREATED
-            )
-        return Response(
-            serializer.errors, 
-            status=status.HTTP_400_BAD_REQUEST
-            )
+                    data={"error": "user_id is exist"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        except ProductUser.DoesNotExist:
+            serializer = ProductUserSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    serializer.data, 
+                    status=status.HTTP_201_CREATED
+                )
+            return Response(
+                serializer.errors, 
+                status=status.HTTP_400_BAD_REQUEST
+                )
 
 class ParentCategoryView(APIView):
     def get(self, request):
