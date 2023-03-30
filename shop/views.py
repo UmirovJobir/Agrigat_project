@@ -65,6 +65,42 @@ class ProductUserView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
                 )
 
+
+class OnlyCategory(APIView):
+    def get(self, request):
+        try:
+            lan = request.META['HTTP_LAN']
+        except:
+            return Response(
+            data={"error": "lan does not exist!"}, 
+            status=status.HTTP_400_BAD_REQUEST
+            )
+        category_id = self.request.query_params.get("id")
+        if category_id is None:
+            categories = Category.objects.filter(parent=None)
+            products = Product.objects.all()
+            category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
+            return Response(data={
+                            "categories":category_serializer.data, 
+                            "products":len(products),}
+                            )
+        else:
+            categories = Category.objects.filter(parent=category_id)
+            if len(categories)==0:
+                products = Product.objects.filter(category=category_id).select_related('product_user').distinct()
+            else:
+                products = Product.objects.filter(category__in=categories).select_related('product_user').distinct()
+                if len(products)==0:
+                    categories_in = Category.objects.filter(parent__in=categories)
+                    products = Product.objects.filter(category__in=categories_in).select_related('product_user').distinct()
+            
+            category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
+            return Response(data={
+                            "categories":category_serializer.data, 
+                            "products":len(products),}
+                            )
+
+
 class ParentCategoryView(APIView):
     def get(self, request):
         try:
@@ -93,24 +129,19 @@ class CategoryProductView(APIView):
         lan = request.META['HTTP_LAN']
         categories = Category.objects.filter(parent=pk)
         if len(categories)==0:
-            products = Product.objects.filter(category=pk) #.select_related('product_user')
+            products = Product.objects.filter(category=pk).select_related('product_user').distinct()
         else:
-            products = Product.objects.filter(category__in=categories) #.select_related('product_user')
+            products = Product.objects.filter(category__in=categories).select_related('product_user').distinct()
             if len(products)==0:
                 categories_in = Category.objects.filter(parent__in=categories)
-                products = Product.objects.filter(category__in=categories_in) #.select_related('product_user')
+                products = Product.objects.filter(category__in=categories_in).select_related('product_user').distinct()
         product_serializer = ProductSerializer(products, many=True)
-        category_serializer = CategorySerializer(
-            categories, 
-            many=True, 
-            context={'lan': lan}
-            )
-        product_count = len(products)
+        category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
         return Response(data={
-            "categories":category_serializer.data, 
-            "product_count":product_count,
-            "products":product_serializer.data}
-            )
+                        "categories":category_serializer.data, 
+                        "product_count":len(products),
+                        "products":product_serializer.data}
+                        )
 
 
 class KeyWordIDView(APIView):

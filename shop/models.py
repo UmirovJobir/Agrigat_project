@@ -46,7 +46,7 @@ class Product(models.Model):
     group_id = models.BigIntegerField()
     group_name = models.CharField(max_length=200)
     group_link = models.CharField(max_length=200, null=False, blank=False)
-    message_id = models.BigIntegerField(unique=True)
+    message_id = models.BigIntegerField()
     message_text = models.TextField()
     media_file = models.TextField()
     datatime = models.IntegerField()
