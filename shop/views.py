@@ -77,28 +77,32 @@ class OnlyCategory(APIView):
             )
         category_id = self.request.query_params.get("id")
         if category_id is None:
-            categories = Category.objects.filter(parent=None)
-            products = Product.objects.all()
-            category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
-            return Response(data={
-                            "categories":category_serializer.data, 
-                            "products":len(products),}
-                            )
+            return Response(data={"error":"query_params is not given"}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            categories = Category.objects.filter(parent=category_id)
-            if len(categories)==0:
-                products = Product.objects.filter(category=category_id).select_related('product_user').distinct()
+            if category_id=='':
+                categories = Category.objects.filter(parent=None)
+                products = Product.objects.all()
+                category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
+                return Response(data={
+                                "categories":category_serializer.data, 
+                                "products":len(products),}
+                                )
             else:
-                products = Product.objects.filter(category__in=categories).select_related('product_user').distinct()
-                if len(products)==0:
-                    categories_in = Category.objects.filter(parent__in=categories)
-                    products = Product.objects.filter(category__in=categories_in).select_related('product_user').distinct()
+                categories = Category.objects.filter(parent=category_id)
+                if len(categories)==0:
+                    products = Product.objects.filter(category=category_id).select_related('product_user').distinct()
+                else:
+                    products = Product.objects.filter(category__in=categories).select_related('product_user').distinct()
+                    if len(products)==0:
+                        categories_in = Category.objects.filter(parent__in=categories)
+                        products = Product.objects.filter(category__in=categories_in).select_related('product_user').distinct()
+                
+                category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
+                return Response(data={
+                                "categories":category_serializer.data, 
+                                "products":len(products),}
+                                )
             
-            category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
-            return Response(data={
-                            "categories":category_serializer.data, 
-                            "products":len(products),}
-                            )
 
 
 class ParentCategoryView(APIView):
