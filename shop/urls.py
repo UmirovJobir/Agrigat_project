@@ -10,16 +10,18 @@ from .views import (
     ProductView,
     ProductDetailView,
     KeyWordView,
-    KeyWordsView,
+    KeyWordIDView,
+    CheckKeywordByWord
 )
 
 urlpatterns = [
     path('user/', UserView.as_view()),
     path('product_user/', ProductUserView.as_view()),
     
-    path('keywords/', KeyWordsView.as_view()),
     path('keyword/', KeyWordView.as_view()),
-    path('keyword/<int:pk>/', KeyWordView.as_view()),
+    path('keyword_id/<int:pk>/', KeyWordIDView.as_view()),
+    
+    path('check_keyword/', CheckKeywordByWord.as_view()),
 
     path('category/', ParentCategoryView.as_view()),
     path('category/<int:pk>/', CategoryProductView.as_view()),

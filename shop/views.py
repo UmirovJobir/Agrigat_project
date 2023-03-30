@@ -130,7 +130,7 @@ class KeyWordIDView(APIView):
                 response.append(i)
         return Response(response)
 
-class KeyWordView(APIView):
+class CheckKeywordByWord(APIView):
     def get(self, request):
         lan = request.META['HTTP_LAN']
         word = self.request.query_params.get("word")
@@ -148,23 +148,7 @@ class KeyWordView(APIView):
                 response.append(i)
         return Response(response)
 
-class KeyWordsView(APIView):
-    def get(self, request):
-        lan = request.META['HTTP_LAN']
-        key_words = KeyWords.objects.all()
-        serializer = KeyWordsSerializer(
-            key_words, 
-            many=True, 
-            context={'lan': lan}
-            )
-        data = serializer.data
-        data = json.loads(json.dumps(data))
-        response = []
-        for i in data:
-            if i['key_words'] != None:
-                response.append(i)
-        return Response(response)
-
+class KeyWordView(APIView):
     def post(self, request):
         try:
             lan = request.META['HTTP_LAN']
