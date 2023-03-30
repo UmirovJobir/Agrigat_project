@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Category, Product, User, KeyWords, ProductUser
-
+from rest_framework.response import Response
+from rest_framework import status
     
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,6 +29,14 @@ class ProductUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductUser
         fields = 'id', 'user_id', 'user_name', 'user_link', 'phone_number'
+    
+    # def create(self, validated_data):
+    #     user_id = validated_data['user_id']
+    #     try:
+    #         product_user = ProductUser.objects.get(user_id=user_id)
+    #         return serializers.ValidationError("Invalid user id")
+    #     except:
+    #         return super().create(validated_data)
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -42,7 +51,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'datatime', 'status'
         ]
 
-    def create(self, validated_data):
+    def create(self, validated_data):   
         product_user_data = validated_data.pop("product_user")
         category_data = validated_data.pop("category")
 
