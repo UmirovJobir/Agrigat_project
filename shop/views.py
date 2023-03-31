@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 import json
+import math
 from .models import (
     User,
     ProductUser,
@@ -81,31 +82,15 @@ class OnlyCategory(APIView):
         else:
             if category_id=='':
                 categories = Category.objects.filter(parent=None)
-                products = Product.objects.all()
-                category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
-                return Response(data={
-                                "categories":category_serializer.data, 
-                                "products":len(products),}
-                                )
             else:
                 categories = Category.objects.filter(parent=category_id)
-                if len(categories)==0:
-                    products = Product.objects.filter(category=category_id).select_related('product_user').distinct()
-                else:
-                    products = Product.objects.filter(category__in=categories).select_related('product_user').distinct()
-                    if len(products)==0:
-                        categories_in = Category.objects.filter(parent__in=categories)
-                        products = Product.objects.filter(category__in=categories_in).select_related('product_user').distinct()
                 
-                category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
-                return Response(data={
-                                "categories":category_serializer.data, 
-                                "products":len(products),}
-                                )
+            category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
+            return Response(data={"categories": category_serializer.data,})
             
 
 
-class ParentCategoryView(APIView):
+class ParentCategoryView(APIView):    
     def get(self, request):
         try:
             lan = request.META['HTTP_LAN']
@@ -114,18 +99,28 @@ class ParentCategoryView(APIView):
             data={"error": "lan does not exist!"}, 
             status=status.HTTP_400_BAD_REQUEST
             )
+        
+        page = int(request.GET.get("page", 1))
+        per_page = 1
+
+
         categories = Category.objects.filter(parent=None)
         products = Product.objects.all()
-        category_serializer = CategorySerializer(
-            categories, 
-            many=True, 
-            context={'lan': lan}
-            )
-        product_serializer = ProductSerializer(products, many=True)
+
+        total = products.count()
+        start = (page - 1) * per_page
+        end = page * per_page
+
+        category_serializer = CategorySerializer(categories, many=True, context={'lan': lan,})
+        product_serializer = ProductSerializer(products[start:end], many=True, context={'request':request})
+
         return Response(data={
-            "categories":category_serializer.data, 
-            "products":product_serializer.data,}
-            )
+                        "categories":category_serializer.data, 
+                        "total_products": total,
+                        "page": page,
+                        "last_page": math.ceil(total/per_page),
+                        "products":product_serializer.data,
+                        })
     
 
 class CategoryProductView(APIView):

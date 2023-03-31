@@ -1,8 +1,7 @@
 from rest_framework import serializers
 from .models import Category, Product, User, KeyWords, ProductUser
-from rest_framework.response import Response
-from rest_framework import status
-    
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -12,18 +11,6 @@ class UserSerializer(serializers.ModelSerializer):
             'phone_number'
         ]
 
-
-class CategorySerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField("category_name")
-
-    class Meta:
-        model = Category
-        fields = 'id', 'parent', 'name'
-    
-    def category_name(self, category):
-        lan = self.context.get("lan")
-        name = category.name
-        return name.get(lan)
 
 class ProductUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -55,6 +42,33 @@ class ProductSerializer(serializers.ModelSerializer):
             product.category.add(category_d)
 
         return product
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField("category_name")
+    products = serializers.SerializerMethodField('product_len')
+
+    def product_len(self, foo):
+        categories = Category.objects.filter(parent=foo.id).distinct()
+        if len(categories)==0:
+            products = Product.objects.filter(category=foo.id).select_related('product_user').distinct()
+            return len(products)
+        else:
+            products = Product.objects.filter(category__in=categories).select_related('product_user').distinct()
+            if len(products)==0:
+                categories_in = Category.objects.filter(parent__in=categories)
+                products = Product.objects.filter(category__in=categories_in).select_related('product_user').distinct()
+            return len(products)
+    
+    def category_name(self, category):
+        lan = self.context.get("lan")
+        name = category.name
+        return name.get(lan)
+    
+    class Meta:
+        model = Category
+        fields = 'id', 'parent', 'name', 'products'
+
 
 class KeyWordsPostSerializer(serializers.ModelSerializer):
     class Meta:
