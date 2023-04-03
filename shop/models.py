@@ -41,6 +41,12 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    STATUS =(
+        ("1", "Active"),
+        ("0", "Passive"),
+        ("-1", "Deleted"),
+    )
+
     product_user = models.ForeignKey(ProductUser, related_name='product_user', on_delete=models.CASCADE, null=True, blank=True)
     category = models.ManyToManyField(Category, related_name='category', blank=True)
     group_id = models.BigIntegerField()
@@ -50,7 +56,7 @@ class Product(models.Model):
     message_text = models.TextField()
     media_file = models.TextField()
     datatime = models.IntegerField()
-    status = models.BooleanField()
+    status = models.CharField(choices=STATUS, max_length=10, default="1")
 
     def __str__(self):
         return self.message_text

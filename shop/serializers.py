@@ -1,6 +1,17 @@
 from rest_framework import serializers
 from .models import Category, Product, User, KeyWords, ProductUser
+from django.contrib.auth.models import Group
+import json
 
+def attempt_json_deserialize(data, expect_type=None):
+    try:
+        data = json.loads(data)
+    except (TypeError, json.decoder.JSONDecodeError): pass
+
+    if expect_type is not None and not isinstance(data, expect_type):
+        raise ValueError(f"Got {type(data)} but expected {expect_type}.")
+
+    return data
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,7 +45,7 @@ class ProductSerializer(serializers.ModelSerializer):
         product_user_data = validated_data.pop("product_user")
         category_data = validated_data.pop("category")
 
-        product_user, created = ProductUser.objects.get_or_create(**product_user_data)
+        product_user = ProductUser.objects.update(**product_user_data)
         
         product = Product.objects.create(product_user=product_user, **validated_data)   
 
@@ -42,6 +53,30 @@ class ProductSerializer(serializers.ModelSerializer):
             product.category.add(category_d)
 
         return product
+
+    def update(self, instance, validated_data):
+        product_user_data = validated_data.pop("product_user")
+        category_data = validated_data.pop('category')
+
+        product_user = instance.product_user
+        for k, v in product_user_data.items():
+            setattr(product_user, k, v)
+        product_user.save()
+
+        toppings_ids = attempt_json_deserialize(category_data, expect_type=list)
+        validated_data['category'] = toppings_ids
+
+        instance.group_id = validated_data.get('group_id', instance.group_id)
+        instance.group_name = validated_data.get('group_name', instance.group_name)
+        instance.group_link = validated_data.get('group_link', instance.group_link)
+        instance.message_id = validated_data.get('message_id', instance.message_id)
+        instance.message_text = validated_data.get('message_text', instance.message_text)
+        instance.media_file = validated_data.get('media_file', instance.media_file)
+        instance.status = validated_data.get('status', instance.status)
+        instance.save()
+        instance = super().update(instance, validated_data)
+
+        return instance
 
 
 class CategorySerializer(serializers.ModelSerializer):

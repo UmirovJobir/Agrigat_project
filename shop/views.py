@@ -2,6 +2,9 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
+from django.core.paginator import Paginator
+from rest_framework.pagination import PageNumberPagination
+from shop.pagination import PaginationHandlerMixin
 import json
 import math
 from .models import (
@@ -88,10 +91,15 @@ class OnlyCategory(APIView):
             category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
             return Response(data={"categories": category_serializer.data,})
             
+class BasicPagination(PageNumberPagination):
+    page_size_query_param = 'limit'
+
+class ParentCategoryView(APIView, PaginationHandlerMixin):    
+    pagination_class = BasicPagination
+    serializer_class = ProductSerializer
 
 
-class ParentCategoryView(APIView):    
-    def get(self, request):
+    def get(self, request, format=None, *args, **kwargs):
         try:
             lan = request.META['HTTP_LAN']
         except:
@@ -99,29 +107,23 @@ class ParentCategoryView(APIView):
             data={"error": "lan does not exist!"}, 
             status=status.HTTP_400_BAD_REQUEST
             )
-        
-        page = int(request.GET.get("page", 1))
-        per_page = 1
 
-
-        categories = Category.objects.filter(parent=None)
-        products = Product.objects.all()
-
-        total = products.count()
-        start = (page - 1) * per_page
-        end = page * per_page
-
+        categories = Category.objects.filter(parent=None).select_related('parent')
         category_serializer = CategorySerializer(categories, many=True, context={'lan': lan,})
-        product_serializer = ProductSerializer(products[start:end], many=True, context={'request':request})
 
+        products = Product.objects.all().select_related('product_user').prefetch_related('category__parent')
+        page = self.paginate_queryset(products)
+
+        if page is not None:
+            product_serializer = self.get_paginated_response(self.serializer_class(page, many=True).data)
+        else:
+            product_serializer = self.serializer_class(products, many=True)
+        
         return Response(data={
                         "categories":category_serializer.data, 
-                        "total_products": total,
-                        "page": page,
-                        "last_page": math.ceil(total/per_page),
                         "products":product_serializer.data,
-                        })
-    
+                        }, status=status.HTTP_200_OK)
+
 
 class CategoryProductView(APIView):
     def get(self, request, pk: int):
@@ -215,8 +217,9 @@ class ProductView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ProductDetailView(APIView):
     def get(self, request, pk):
@@ -228,6 +231,14 @@ class ProductDetailView(APIView):
         products = get_object_or_404(Product, pk=pk)
         products.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def put(self, request, pk, format=None):
+        products = get_object_or_404(Product, pk=pk)
+        serializer = ProductSerializer(products, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         
 
