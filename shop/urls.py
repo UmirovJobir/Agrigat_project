@@ -12,7 +12,8 @@ from .views import (
     ProductDetailView,
     KeyWordView,
     KeyWordIDView,
-    CheckKeywordByWord
+    CheckKeywordByWord,
+    Test
 )
 
 urlpatterns = [
@@ -30,5 +31,7 @@ urlpatterns = [
 
     path('product/', ProductView.as_view()),
     path('product/<int:pk>/', ProductDetailView.as_view()),
+
+    path('test/', Test.as_view())
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  

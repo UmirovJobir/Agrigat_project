@@ -242,4 +242,13 @@ class ProductDetailView(APIView):
 
         
 
-
+class Test(APIView):
+    def put(self, request, format=None):
+        group_id = request.GET.get('group_id')
+        message_id = request.GET.get('message_id')
+        products = get_object_or_404(Product, group_id=group_id, message_id=message_id)
+        serializer = ProductSerializer(products, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
