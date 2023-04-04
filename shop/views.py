@@ -242,7 +242,7 @@ class ProductDetailView(APIView):
 
         
 
-class Test(APIView):
+class UpdateProductByGroupId(APIView):
     def put(self, request, format=None):
         group_id = request.GET.get('group_id')
         message_id = request.GET.get('message_id')

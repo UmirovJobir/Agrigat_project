@@ -81,35 +81,35 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    # name = serializers.SerializerMethodField("category_name")
+    name = serializers.SerializerMethodField("category_name")
     products = serializers.SerializerMethodField('product_len')
 
     def product_len(self, foo):
-        categories = Category.objects.filter(parent=foo.id)
-        categories = Category.objects.filter(products__category__in=categories)
-        # if len(categories)==0:
-        #     categories = Category.objects.filter(parent=foo.id)
-        #     print(categories)
-        #     categories = Category.objects.filter(products__category__in=categories)
-        # print(categories)
-        return len(categories)
+        # categories = Category.objects.filter(parent=foo.id)
+        # categories = Category.objects.filter(products__category__in=categories)
+        # # if len(categories)==0:
+        # #     categories = Category.objects.filter(parent=foo.id)
+        # #     print(categories)
+        # #     categories = Category.objects.filter(products__category__in=categories)
+        # # print(categories)
+        # return len(categories)
 
 
-        # categories = Category.objects.filter(parent=foo.id).distinct()
-        # if len(categories)==0:
-        #     products = Product.objects.filter(category=foo.id).select_related('product_user').distinct()
-        #     return len(products)
-        # else:
-        #     products = Product.objects.filter(category__in=categories).select_related('product_user').distinct()
-        #     if len(products)==0:
-        #         categories_in = Category.objects.filter(parent__in=categories)
-        #         products = Product.objects.filter(category__in=categories_in).select_related('product_user').distinct()
-        #     return len(products)
+        categories = Category.objects.filter(parent=foo.id).distinct()
+        if len(categories)==0:
+            products = Product.objects.filter(category=foo.id).select_related('product_user').distinct()
+            return len(products)
+        else:
+            products = Product.objects.filter(category__in=categories).select_related('product_user').distinct()
+            if len(products)==0:
+                categories_in = Category.objects.filter(parent__in=categories)
+                products = Product.objects.filter(category__in=categories_in).select_related('product_user').distinct()
+            return len(products)
     
-    # def category_name(self, category):
-    #     lan = self.context.get("lan")
-    #     name = category.name
-    #     return name.get(lan)
+    def category_name(self, category):
+        lan = self.context.get("lan")
+        name = category.name
+        return name.get(lan)
     
     class Meta:
         model = Category
