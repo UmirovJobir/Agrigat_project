@@ -80,6 +80,7 @@ class OnlyCategory(APIView):
             status=status.HTTP_400_BAD_REQUEST
             )
         category_id = self.request.query_params.get("id")
+        
         if category_id is None:
             return Response(data={"error":"query_params is not given"}, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -89,7 +90,15 @@ class OnlyCategory(APIView):
                 categories = Category.objects.filter(parent=category_id)
                 
             category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
-            return Response(data={"categories": category_serializer.data,})
+
+            if category_id=='':
+                return Response(data={"categories": category_serializer.data,})
+            else:
+                category_name = Category.objects.get(id=category_id).name[f'{lan}']
+                return Response(data={
+                    "category_name":category_name,
+                    "categories": category_serializer.data,}
+                    )
             
 class BasicPagination(PageNumberPagination):
     page_size_query_param = 'limit'
@@ -127,7 +136,16 @@ class ParentCategoryView(APIView, PaginationHandlerMixin):
 
 class CategoryProductView(APIView):
     def get(self, request, pk: int):
-        lan = request.META['HTTP_LAN']
+        try:
+            lan = request.META['HTTP_LAN']
+        except:
+            return Response(
+            data={"error": "lan does not exist!"}, 
+            status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        category_name = Category.objects.get(id=pk).name[f'{lan}']
+
         categories = Category.objects.filter(parent=pk)
         if len(categories)==0:
             products = Product.objects.filter(category=pk).select_related('product_user').distinct()
@@ -137,8 +155,11 @@ class CategoryProductView(APIView):
                 categories_in = Category.objects.filter(parent__in=categories)
                 products = Product.objects.filter(category__in=categories_in).select_related('product_user').distinct()
         product_serializer = ProductSerializer(products, many=True)
+
+        
         category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
         return Response(data={
+                        "category_name":category_name,
                         "categories":category_serializer.data, 
                         "product_count":len(products),
                         "products":product_serializer.data}
@@ -207,10 +228,27 @@ class KeyWordView(APIView):
       
 class ProductView(APIView):
     def get(self, request):
-        products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
+        group_id = request.GET.get('group_id')
+        message_id = request.GET.get('message_id')
+        
+        if (group_id==None) and (message_id==None):
+            products = Product.objects.all()
+            serializer = ProductSerializer(products, many=True)
+        else:
+            products = get_object_or_404(Product, group_id=group_id, message_id=message_id)
+            serializer = ProductSerializer(products)
         return Response(serializer.data)
-    
+
+    def delete(self, request):
+        group_id = request.GET.get('group_id')
+        message_id = request.GET.get('message_id')
+        
+        if (group_id!=None) and (message_id!=None):
+            products = get_object_or_404(Product, group_id=group_id, message_id=message_id)
+            products.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(data={"error":"group_id and message_id is not given in params!"},status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         serializer = ProductSerializer(data=request.data)
