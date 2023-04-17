@@ -36,7 +36,7 @@ if settings.DEBUG == True:
 #Swagger
 schema_view = get_schema_view(
     openapi.Info(
-        title= 'HR-Agrozamin',
+        title= 'Agrigate',
         default_version='v1',
         description='Swagger docs for Rest API',
     ),
