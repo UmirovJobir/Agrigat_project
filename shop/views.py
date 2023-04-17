@@ -266,7 +266,7 @@ class ProductView(APIView):
                 product.save()
                 serializer = ProductSerializer(product)
                 return Response(serializer.data, status=status.HTTP_302_FOUND)
-        except ProductUser.DoesNotExist:
+        except (ProductUser.DoesNotExist, Product.DoesNotExist) as e:
             serializer = ProductSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
