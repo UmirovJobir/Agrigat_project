@@ -55,29 +55,29 @@ class ProductSerializer(serializers.ModelSerializer):
         return product
 
 
-    def update(self, instance, validated_data):
-        product_user_data = validated_data.pop("product_user")
-        category_data = validated_data.pop('category')
+    # def update(self, instance, validated_data):     #update product with nested serializer
+    #     product_user_data = validated_data.pop("product_user")
+    #     category_data = validated_data.pop('category')
 
-        product_user = instance.product_user
-        for k, v in product_user_data.items():
-            setattr(product_user, k, v)
-        product_user.save()
+    #     product_user = instance.product_user
+    #     for k, v in product_user_data.items():
+    #         setattr(product_user, k, v)
+    #     product_user.save()
 
-        category_ids = attempt_json_deserialize(category_data, expect_type=list)
-        validated_data['category'] = category_ids
+    #     category_ids = attempt_json_deserialize(category_data, expect_type=list)
+    #     validated_data['category'] = category_ids
 
-        instance.group_id = validated_data.get('group_id', instance.group_id)
-        instance.group_name = validated_data.get('group_name', instance.group_name)
-        instance.group_link = validated_data.get('group_link', instance.group_link)
-        instance.message_id = validated_data.get('message_id', instance.message_id)
-        instance.message_text = validated_data.get('message_text', instance.message_text)
-        instance.media_file = validated_data.get('media_file', instance.media_file)
-        instance.status = validated_data.get('status', instance.status)
-        instance.save()
-        instance = super().update(instance, validated_data)
+    #     instance.group_id = validated_data.get('group_id', instance.group_id)
+    #     instance.group_name = validated_data.get('group_name', instance.group_name)
+    #     instance.group_link = validated_data.get('group_link', instance.group_link)
+    #     instance.message_id = validated_data.get('message_id', instance.message_id)
+    #     instance.message_text = validated_data.get('message_text', instance.message_text)
+    #     instance.media_file = validated_data.get('media_file', instance.media_file)
+    #     instance.status = validated_data.get('status', instance.status)
+    #     instance.save()
+    #     instance = super().update(instance, validated_data)
 
-        return instance
+    #     return instance
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -85,16 +85,6 @@ class CategorySerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField('product_len')
 
     def product_len(self, foo):
-        # categories = Category.objects.filter(parent=foo.id)
-        # categories = Category.objects.filter(products__category__in=categories)
-        # # if len(categories)==0:
-        # #     categories = Category.objects.filter(parent=foo.id)
-        # #     print(categories)
-        # #     categories = Category.objects.filter(products__category__in=categories)
-        # # print(categories)
-        # return len(categories)
-
-
         categories = Category.objects.filter(parent=foo.id).distinct()
         if len(categories)==0:
             products = Product.objects.filter(category=foo.id).select_related('product_user').distinct()

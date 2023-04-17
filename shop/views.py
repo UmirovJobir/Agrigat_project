@@ -270,9 +270,9 @@ class ProductDetailView(APIView):
         products.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def put(self, request, pk, format=None):
+    def patch(self, request, pk, format=None):
         products = get_object_or_404(Product, pk=pk)
-        serializer = ProductSerializer(products, data=request.data)
+        serializer = ProductSerializer(products, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -281,12 +281,13 @@ class ProductDetailView(APIView):
         
 
 class UpdateProductByGroupId(APIView):
-    def put(self, request, format=None):
+    def patch(self, request, format=None):
         group_id = request.GET.get('group_id')
         message_id = request.GET.get('message_id')
         products = get_object_or_404(Product, group_id=group_id, message_id=message_id)
-        serializer = ProductSerializer(products, data=request.data)
+        serializer = ProductSerializer(products, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
