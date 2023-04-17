@@ -251,12 +251,28 @@ class ProductView(APIView):
             return Response(data={"error":"group_id and message_id is not given in params!"},status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
-        serializer = ProductSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        user_id = request.data['product_user']['user_id']
+        message_text = request.data['message_text']
+
+        try:
+            product_user = ProductUser.objects.get(user_id=user_id)
+            product = Product.objects.get(product_user=product_user, message_text=message_text)
+            if product:
+                product.group_id = request.data['group_id']
+                product.group_name = request.data['group_name']
+                product.group_link = request.data['group_link']
+                product.message_id = request.data['message_id']
+                product.datatime = request.data['datatime']
+                product.save()
+                serializer = ProductSerializer(product)
+                return Response(serializer.data, status=status.HTTP_302_FOUND)
+        except ProductUser.DoesNotExist:
+            serializer = ProductSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProductDetailView(APIView):
