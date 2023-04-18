@@ -94,9 +94,10 @@ class OnlyCategory(APIView):
             if category_id=='':
                 return Response(data={"categories": category_serializer.data,})
             else:
-                category_name = Category.objects.get(id=category_id).name[f'{lan}']
+                category_name = Category.objects.get(id=category_id)
                 return Response(data={
-                    "category_name":category_name,
+                    "id": category_name.id,
+                    "category_name":category_name.name[f'{lan}'],
                     "categories": category_serializer.data,}
                     )
             

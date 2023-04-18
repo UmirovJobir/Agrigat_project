@@ -103,7 +103,7 @@ class CategorySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Category
-        fields = 'id', 'parent', 'name', 'products'
+        fields = 'id', 'name', 'products'
 
 
 class KeyWordsPostSerializer(serializers.ModelSerializer):
