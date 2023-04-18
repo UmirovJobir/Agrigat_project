@@ -95,8 +95,14 @@ class OnlyCategory(APIView):
                 return Response(data={"categories": category_serializer.data,})
             else:
                 category_name = Category.objects.get(id=category_id)
+                
+                try:
+                    parent_id = category_name.parent.id
+                except AttributeError:
+                    parent_id = None
+
                 return Response(data={
-                    "id": category_name.id,
+                    "parent_id": parent_id,
                     "category_name":category_name.name[f'{lan}'],
                     "categories": category_serializer.data,}
                     )
