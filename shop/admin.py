@@ -92,7 +92,7 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('group_id','group_name','message_id', 'message_text')
     raw_id_fields   = 'category',
     list_display_links = 'group_id',
-    raw_id_fields = 'product_user',
+    raw_id_fields = 'product_user','category',
 
 
 
