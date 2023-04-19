@@ -27,6 +27,7 @@ class UserAdmin(admin.ModelAdmin):
 class ProductUserAdmin(admin.ModelAdmin):
     list_display = 'id', 'user_id', 'user_name', 'user_link', 'phone_number'
     list_display_links = 'user_id', 'user_name'
+    search_fields = 'user_id', 'user_name', 'phone_number'
 
 
 @admin.register(Category)
