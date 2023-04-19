@@ -38,7 +38,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'id', 'product_user', 'category', 
             'group_id', 'group_name', 'group_link',
             'message_id', 'message_text', 'media_file', 
-            'datatime', 'status'
+            'datatime'
         ]
 
     def create(self, validated_data):
