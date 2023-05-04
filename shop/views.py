@@ -233,14 +233,23 @@ class KeyWordView(APIView):
             )
 
       
-class ProductView(APIView):
+class ProductView(APIView, PaginationHandlerMixin):
+    pagination_class = BasicPagination
+    serializer_class = ProductSerializer
+
     def get(self, request):
         group_id = request.GET.get('group_id')
         message_id = request.GET.get('message_id')
         
         if (group_id==None) and (message_id==None):
-            products = Product.objects.all()
-            serializer = ProductSerializer(products, many=True)
+            products = Product.objects.all().select_related('product_user').prefetch_related('category__parent')
+            page = self.paginate_queryset(products)
+
+            if page is not None:
+                serializer = self.get_paginated_response(self.serializer_class(page, many=True).data)
+            else:
+                serializer = self.serializer_class(products, many=True)
+
         else:
             products = get_object_or_404(Product, group_id=group_id, message_id=message_id)
             serializer = ProductSerializer(products)
@@ -269,7 +278,7 @@ class ProductView(APIView):
                 product.group_name = request.data['group_name']
                 product.group_link = request.data['group_link']
                 product.message_id = request.data['message_id']
-                product.datatime = request.data['datatime']
+                product.timestep = request.data['datatime']
                 product.save()
                 serializer = ProductSerializer(product)
                 return Response(serializer.data, status=status.HTTP_302_FOUND)

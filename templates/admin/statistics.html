@@ -1,0 +1,124 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+{% load static %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js">
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-v4-grid-only@1.0.0/dist/bootstrap-grid.min.css">
+<form id="filterForm">
+  <div id="selects">
+    <div>
+      <label for="month">Choose a month:</label>
+      <select name="month" id="month"></select>
+    </div>
+    <div style="display: none;">
+      <label for="days">Choose a days:</label>
+      <select name="month" id="days"></select>
+    </div>
+  </div>
+  <!-- <input type="submit" value="Load" name="_load"> -->
+</form>
+
+<div>
+  <canvas id="myChart"></canvas>
+</div>
+
+<script>
+let productGroups = null;
+
+  $(document).ready(function() {
+
+    $.ajax({
+      url: "/get_months/",
+      type: "GET",
+      dataType: "json",
+      success: (jsonResponse) => {
+        jsonResponse.months.forEach(option => {
+          $("#month").append(new Option(option, option));
+        });
+      },
+      error: () => console.log("Failed to fetch chart filter options!")
+    });
+
+    $('#month').on('change', function  (){
+        let month = $(this).val();
+
+        $.ajax({
+          url: `/get_days/${month}`,
+          type: "GET",
+          dataType: 'JSON',
+          success: function (data){
+              let days = document.getElementById('days');
+              days.innerHTML = '';
+
+              data.days.forEach(day => {
+                days.append(new Option(day, day));
+              }); 
+
+              days.parentElement.style.display = 'block';
+          }
+        });
+
+
+    });
+
+    $('#days').on('change', function(){
+      let month = $('#month').val();
+      let day = $(this).val();
+
+      $.ajax({
+        url: `/get_groups_products/${month}/${day}`,
+        type: "GET",
+        dataType: 'JSON',
+        success: function (data){
+          console.log(data);
+          if(productGroups === null){
+            createChart(data);
+          }else{
+            loadProductGroups(data);
+          }
+        }
+      });
+    });
+
+  });
+  
+  function createChart(data){
+    productGroups = new Chart(document.getElementById('myChart'), {
+      type: 'bar',
+      data: {
+        labels: data.groups,
+        datasets: [
+        {
+        label: '# of Votes',
+        data: data.products,
+        borderWidth: 1
+    }
+        ]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }
+
+  function loadProductGroups(data){
+    productGroups.data.labels = [];
+    productGroups.data.datasets = [];
+
+    productGroups.data.labels = data.groups;
+    productGroups.data.datasets.push({
+        label: '# of Votes',
+        data: data.products,
+        borderWidth: 1
+    });
+
+    productGroups.update();
+  }
+</script>
+
+{% endblock %}

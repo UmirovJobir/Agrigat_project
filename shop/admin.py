@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Category, Product, KeyWords, ProductUser
+from .models import User, Category, Product, KeyWords, ProductUser, Group
 from django.forms import forms
 from django.urls import path
 from django.shortcuts import render
@@ -10,6 +10,10 @@ import json
 admin.site.site_header = "Agrigat"
 admin.site.site_title = "Agrigat bot portali"
 admin.site.index_title = "Agrigat bot portaliga xush kelibsiz"
+
+@admin.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+    list_display = ('id', 'group_id', 'group_name', 'group_link',)
 
 @admin.register(KeyWords)
 class KeyWordsAdmin(admin.ModelAdmin):
@@ -88,8 +92,9 @@ class CategoryAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'group_id', 'group_name', 'group_link', 'message_id', 
-        'message_text', 'media_file', 'datatime',
+        'message_text', 'media_file', 'timestep',
     )
+    list_filter = 'group_test',
     search_fields = ('group_id','group_name','message_id', 'message_text')
     raw_id_fields   = 'category',
     list_display_links = 'group_id',

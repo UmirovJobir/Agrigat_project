@@ -1,5 +1,6 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+from datetime import datetime
 
 
 class User(models.Model):
@@ -10,7 +11,7 @@ class User(models.Model):
     phone_number = PhoneNumberField(blank=True)
 
     def __str__(self):
-        return self.username
+        return self.user_name
 
     class Meta:
         verbose_name='Bot user'
@@ -40,16 +41,32 @@ class Category(models.Model):
         verbose_name_plural='Categories'
 
 
+class Group(models.Model):
+    group_id = models.BigIntegerField()
+    group_name = models.CharField(max_length=200)
+    group_link = models.CharField(max_length=200, null=False, blank=False)
+
+    def __str__(self):
+        return f"{self.group_id, self.group_name}"
+    
+    class Meta:
+        verbose_name='Group'
+        verbose_name_plural='Groups'
+
+
 class Product(models.Model):
     product_user = models.ForeignKey(ProductUser, related_name='product_user', on_delete=models.CASCADE, null=True, blank=True)
     category = models.ManyToManyField(Category, related_name='category', blank=True)
+    group_test = models.ForeignKey(Group, related_name='group_test', on_delete=models.CASCADE, null=True, blank=True)
     group_id = models.BigIntegerField()
     group_name = models.CharField(max_length=200)
     group_link = models.CharField(max_length=200, null=False, blank=False)
     message_id = models.BigIntegerField()
     message_text = models.TextField()
     media_file = models.TextField()
-    datatime = models.IntegerField()
+    timestep = models.IntegerField()
+    datetime = models.DateTimeField(default=datetime.now, blank=True)
+
 
     def __str__(self):
         return self.message_text

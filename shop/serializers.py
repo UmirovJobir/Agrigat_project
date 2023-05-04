@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Product, User, KeyWords, ProductUser
-from django.contrib.auth.models import Group
+from .models import Category, Product, User, KeyWords, ProductUser, Group
 import json
 
 def attempt_json_deserialize(data, expect_type=None):
@@ -28,17 +27,22 @@ class ProductUserSerializer(serializers.ModelSerializer):
         model = ProductUser
         fields = 'id', 'user_id', 'user_name', 'user_link', 'phone_number'
 
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ['id','group_id', 'group_name', 'group_link',]
 
 class ProductSerializer(serializers.ModelSerializer):
     product_user = ProductUserSerializer()
+    group_test = GroupSerializer()
 
     class Meta:
         model = Product
         fields = [
-            'id', 'product_user', 'category', 
+            'id', 'product_user', 'category', 'group_test',
             'group_id', 'group_name', 'group_link',
             'message_id', 'message_text', 'media_file', 
-            'datatime'
+            'timestep', 'datetime'
         ]
 
     def create(self, validated_data):
@@ -84,10 +88,10 @@ class CategorySerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField("category_name")
     products = serializers.SerializerMethodField('product_len')
 
-    def product_len(self, foo):
-        categories = Category.objects.filter(parent=foo.id).distinct()
+    def product_len(self, category):
+        categories = Category.objects.filter(parent=category.id).distinct()
         if len(categories)==0:
-            products = Product.objects.filter(category=foo.id).select_related('product_user').distinct()
+            products = Product.objects.filter(category=category.id).select_related('product_user').distinct()
             return len(products)
         else:
             products = Product.objects.filter(category__in=categories).select_related('product_user').distinct()

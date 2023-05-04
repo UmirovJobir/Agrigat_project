@@ -19,10 +19,16 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
 from drf_yasg.views import get_schema_view
+from .admin import admin_statistics_view    
 from drf_yasg import openapi
 from rest_framework.permissions import AllowAny
 
 urlpatterns = [
+    path(
+        "admin/statistics/",
+        admin.site.admin_view(admin_statistics_view),
+        name="admin-statistics"
+    ),
     path('admin/', admin.site.urls),
     path('', include('shop.urls')),
 ]
