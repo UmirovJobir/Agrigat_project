@@ -2,7 +2,7 @@ from django.core.management import BaseCommand
 from datetime import datetime
 import pytz
 
-# from shop.models import Product
+from shop.models import Product
 
 
 def timestep_to_datatime(timestep):
@@ -12,15 +12,15 @@ def timestep_to_datatime(timestep):
     
     return local_dt
 
-# class Command(BaseCommand):
-#     def handle(self, *args, **options):
-#         products = Product.objects.all()
-#         product_count = 0
-#         for product in products:
-#             product.datetime = timestep_to_datatime(product.timestep)
-#             product.save()
-#             product_count += 1
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        products = Product.objects.all()
+        product_count = 0
+        for product in products:
+            product.datetime = timestep_to_datatime(product.timestep)
+            product.save()
+            product_count += 1
 
-#         self.stdout.write(f"{product_count}")
+        self.stdout.write(f"{product_count}")
 
-print(timestep_to_datatime(1682975483))
+
