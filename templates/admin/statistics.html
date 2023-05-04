@@ -16,7 +16,7 @@
     <div style="display: none;">
       <label for="days">Choose a days:</label>
       <select name="month" id="days">
-        <option value="">Choose days</option>
+        <option value="">Choose day</option>
       </select>
     </div>
   </div>
@@ -75,7 +75,7 @@ let productGroups = null;
         type: "GET",
         dataType: 'JSON',
         success: function (data){
-          console.log(data);
+          // console.log(data);
           if(productGroups === null){
             createChart(data);
           }else{
