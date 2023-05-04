@@ -11,7 +11,7 @@
       <label for="month">Choose a month:</label>
       <select name="month" id="month"></select>
     </div>
-    <div style="display: none;">
+    <div>  <!-- style="display: none;"> -->
       <label for="days">Choose a days:</label>
       <select name="month" id="days"></select>
     </div>
@@ -20,7 +20,7 @@
 </form>
 
 <div>
-  <canvas id="myChart"></canvas>
+  <canvas id="myChart" width="100" height="30vh"></canvas>
 </div>
 
 <script>
@@ -90,7 +90,7 @@ let productGroups = null;
         labels: data.groups,
         datasets: [
         {
-        label: '# of Votes',
+        label: 'Products',
         data: data.products,
         borderWidth: 1
     }
@@ -112,7 +112,7 @@ let productGroups = null;
 
     productGroups.data.labels = data.groups;
     productGroups.data.datasets.push({
-        label: '# of Votes',
+        label: 'Products',
         data: data.products,
         borderWidth: 1
     });
