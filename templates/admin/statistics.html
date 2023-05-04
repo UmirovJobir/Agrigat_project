@@ -9,14 +9,18 @@
   <div id="selects">
     <div>
       <label for="month">Choose a month:</label>
-      <select name="month" id="month"></select>
+      <select name="month" id="month">
+        <option value="">Choose month</option>
+      </select>
     </div>
-    <div>  <!-- style="display: none;"> -->
+    <div style="display: none;">
       <label for="days">Choose a days:</label>
-      <select name="month" id="days"></select>
+      <select name="month" id="days">
+        <option value="">Choose days</option>
+      </select>
     </div>
   </div>
-  <!-- <input type="submit" value="Load" name="_load"> -->
+  <input type="submit" value="Load" name="_load">
 </form>
 
 <div>
@@ -49,7 +53,7 @@ let productGroups = null;
           dataType: 'JSON',
           success: function (data){
               let days = document.getElementById('days');
-              days.innerHTML = '';
+              days.innerHTML = '<option value="">Choose day</option>';
 
               data.days.forEach(day => {
                 days.append(new Option(day, day));
