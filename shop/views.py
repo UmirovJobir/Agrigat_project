@@ -1,3 +1,4 @@
+from http.client import NOT_FOUND
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework import status
@@ -12,7 +13,9 @@ from .models import (
     ProductUser,
     Category, 
     Product,  
-    KeyWords)
+    KeyWords,
+    Group
+    )
 from .serializers import (
     UserSerializer,
     ProductUserSerializer,
@@ -127,7 +130,7 @@ class ParentCategoryView(APIView, PaginationHandlerMixin):
         categories = Category.objects.filter(parent=None).select_related('parent')
         category_serializer = CategorySerializer(categories, many=True, context={'lan': lan,})
 
-        products = Product.objects.all().select_related('product_user').prefetch_related('category__parent')
+        products = Product.objects.all().select_related('product_user').prefetch_related('categories')
         page = self.paginate_queryset(products)
 
         if page is not None:
@@ -242,16 +245,15 @@ class ProductView(APIView, PaginationHandlerMixin):
         message_id = request.GET.get('message_id')
         
         if (group_id==None) and (message_id==None):
-            products = Product.objects.all().select_related('product_user').prefetch_related('category__parent')
+            products = Product.objects.all().select_related('product_user').prefetch_related('categories__parent').order_by('-id')
             page = self.paginate_queryset(products)
 
             if page is not None:
                 serializer = self.get_paginated_response(self.serializer_class(page, many=True).data)
             else:
                 serializer = self.serializer_class(products, many=True)
-
         else:
-            products = get_object_or_404(Product, group_id=group_id, message_id=message_id)
+            products = get_object_or_404(Product, group__group_id=group_id, message_id=message_id)
             serializer = ProductSerializer(products)
         return Response(serializer.data)
 
@@ -260,35 +262,51 @@ class ProductView(APIView, PaginationHandlerMixin):
         message_id = request.GET.get('message_id')
         
         if (group_id!=None) and (message_id!=None):
-            products = get_object_or_404(Product, group_id=group_id, message_id=message_id)
+            products = get_object_or_404(Product, group__group_id=group_id, message_id=message_id)
             products.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(data={"error":"group_id and message_id is not given in params!"},status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
-        user_id = request.data['product_user']['user_id']
-        message_text = request.data['message_text']
+        product_user, created = ProductUser.objects.get_or_create(
+            user_id = request.data['product_user']['user_id'], 
+            user_name = request.data['product_user']['user_name'],
+            user_link = request.data['product_user']['user_link'],
+            phone_number = request.data['product_user']['phone_number'],
+        )
+
+        group, created = Group.objects.get_or_create(
+            group_id = request.data['group']['group_id'],
+            group_name = request.data['group']['group_name'],
+            group_link = request.data['group']['group_link'],
+        )
 
         try:
-            product_user = ProductUser.objects.get(user_id=user_id)
-            product = Product.objects.get(product_user=product_user, message_text=message_text)
+            product = Product.objects.get(product_user=product_user, message_text=request.data['message_text'])
+
             if product:
-                product.group_id = request.data['group_id']
-                product.group_name = request.data['group_name']
-                product.group_link = request.data['group_link']
+                product.group = group
                 product.message_id = request.data['message_id']
-                product.timestep = request.data['datatime']
+                product.datetime = request.data['datetime']
                 product.save()
                 serializer = ProductSerializer(product)
                 return Response(serializer.data, status=status.HTTP_302_FOUND)
-        except (ProductUser.DoesNotExist, Product.DoesNotExist) as e:
-            serializer = ProductSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+        except (Product.DoesNotExist) as e:
+            product = Product.objects.create(
+                product_user = product_user,
+                message_id = request.data['message_id'],
+                message_text = request.data['message_text'],
+                media_file = request.data['media_file'],
+                datetime = request.data['datetime'],
+            )
+            for category in request.data['categories']:
+                product.categories.add(category)
+
+            serializer = ProductSerializer(product)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
 
 
 class ProductDetailView(APIView):
@@ -303,12 +321,34 @@ class ProductDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def patch(self, request, pk, format=None):
-        products = get_object_or_404(Product, pk=pk)
-        serializer = ProductSerializer(products, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        product = get_object_or_404(Product, pk=pk)
+
+        group, created = Group.objects.get_or_create(
+            group_id = request.data['group']['group_id'],
+            group_name = request.data['group']['group_name'],
+            group_link = request.data['group']['group_link'],
+        )
+
+        product.group = group
+        product.message_id = request.data['message_id']
+        product.message_text = request.data['message_text']
+        product.media_file = request.data['media_file']
+        product.datetime = request.data['datetime']
+
+        categories = []
+        for category_id in request.data.get('categories'):
+            try:
+                category = Category.objects.get(id=category_id)
+                categories.append(category)
+            except:
+                return Response(data={"error":"Category id does not exist"}, status=status.HTTP_404_NOT_FOUND)
+            
+        product.categories.set(categories)
+
+        product.save()
+
+        serializer = ProductSerializer(product)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
         
 
@@ -316,7 +356,7 @@ class UpdateProductByGroupId(APIView):
     def patch(self, request, format=None):
         group_id = request.GET.get('group_id')
         message_id = request.GET.get('message_id')
-        products = get_object_or_404(Product, group_id=group_id, message_id=message_id)
+        products = get_object_or_404(Product, group__group_id=group_id, message_id=message_id)
         serializer = ProductSerializer(products, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()

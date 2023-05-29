@@ -56,15 +56,11 @@ class Group(models.Model):
 
 class Product(models.Model):
     product_user = models.ForeignKey(ProductUser, related_name='product_user', on_delete=models.CASCADE, null=True, blank=True)
-    category = models.ManyToManyField(Category, related_name='category', blank=True)
-    group_test = models.ForeignKey(Group, related_name='group_test', on_delete=models.CASCADE, null=True, blank=True)
-    group_id = models.BigIntegerField()
-    group_name = models.CharField(max_length=200)
-    group_link = models.CharField(max_length=200, null=False, blank=False)
+    categories = models.ManyToManyField(Category, related_name='category', blank=True)
+    group = models.ForeignKey(Group, related_name='group', on_delete=models.CASCADE, null=True, blank=True)
     message_id = models.BigIntegerField()
     message_text = models.TextField()
     media_file = models.TextField()
-    timestep = models.IntegerField()
     datetime = models.DateTimeField(default=datetime.now, blank=True)
 
 

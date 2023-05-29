@@ -91,14 +91,12 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'group_id', 'group_name', 'group_link', 'message_id', 
-        'message_text', 'media_file', 'timestep',
+        'id','message_id', 'message_text', 'media_file', 'datetime',
     )
-    list_filter = 'group_test',
-    search_fields = ('group_id','group_name','message_id', 'message_text')
-    raw_id_fields   = 'category',
-    list_display_links = 'group_id',
-    raw_id_fields = 'product_user','category',
+    list_filter = 'group',
+    search_fields = ('message_id', 'message_text'),
+    raw_id_fields = 'product_user','categories',
+    list_per_page = 10
 
 
 
