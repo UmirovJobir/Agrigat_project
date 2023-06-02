@@ -40,11 +40,11 @@ def get_days(request, month):
 @staff_member_required
 def get_products_len_in_a_day_by_groups(request, month, day):
     products = Product.objects.filter(datetime__month=month, datetime__day=day)
-    groups = Group.objects.filter(group_test__in=products).distinct()
+    groups = Group.objects.filter(group__in=products).distinct()
 
     data = {}
     for group in groups:
-        groups_products = products.filter(group_test=group)
+        groups_products = products.filter(group=group)
         
         data[group.group_name]=len(groups_products)
         
