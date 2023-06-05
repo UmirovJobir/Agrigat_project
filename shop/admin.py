@@ -95,7 +95,7 @@ class ProductAdmin(admin.ModelAdmin):
         'id','message_id', 'message_text', 'media_file', 'datetime',
     )
     list_filter = 'group',
-    search_fields = ('message_id', 'message_text'),
+    search_fields = 'message_id', 'message_text'
     raw_id_fields = 'product_user','categories',
     list_per_page = 10
 
