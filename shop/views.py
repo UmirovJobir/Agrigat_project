@@ -269,18 +269,20 @@ class ProductView(APIView, PaginationHandlerMixin):
             return Response(data={"error":"group_id and message_id is not given in params!"},status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
-        product_user, created = ProductUser.objects.get_or_create(
+
+        group, created_group = Group.objects.get_or_create(
+            group_id = request.data['group']['group_id'],
+            group_name = request.data['group']['group_name'],
+            group_link = request.data['group']['group_link'],
+        )
+
+        product_user, created_product = ProductUser.objects.get_or_create(
             user_id = request.data['product_user']['user_id'], 
             user_name = request.data['product_user']['user_name'],
             user_link = request.data['product_user']['user_link'],
             phone_number = request.data['product_user']['phone_number'],
         )
 
-        group, created = Group.objects.get_or_create(
-            group_id = request.data['group']['group_id'],
-            group_name = request.data['group']['group_name'],
-            group_link = request.data['group']['group_link'],
-        )
 
         try:
             product = Product.objects.get(product_user=product_user, message_text=request.data['message_text'])
@@ -296,6 +298,7 @@ class ProductView(APIView, PaginationHandlerMixin):
         except (Product.DoesNotExist) as e:
             product = Product.objects.create(
                 product_user = product_user,
+                group = group,
                 message_id = request.data['message_id'],
                 message_text = request.data['message_text'],
                 media_file = request.data['media_file'],

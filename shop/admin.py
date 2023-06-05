@@ -14,6 +14,7 @@ admin.site.index_title = "Agrigat bot portaliga xush kelibsiz"
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('id', 'group_id', 'group_name', 'group_link',)
+    search_fields = 'group_id',
 
 @admin.register(KeyWords)
 class KeyWordsAdmin(admin.ModelAdmin):
