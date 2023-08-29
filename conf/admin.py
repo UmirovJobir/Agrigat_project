@@ -6,7 +6,7 @@ from django.urls import path
 
 @staff_member_required
 def admin_statistics_view(request):
-    return render(request, "agrigate/admin/statistics.html", {
+    return render(request, "admin/statistics.html", {
         "title": "Statistics"
     })
 
@@ -22,7 +22,7 @@ class CustomAdminSite(admin.AdminSite):
                     {
                         "name": "Statistics",
                         "object_name": "statistics",
-                        "admin_url": "agrigate/statistics",
+                        "admin_url": "/agrigate/admin/statistics",
                         "view_only": True,
                     }
                 ],
