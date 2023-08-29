@@ -25,12 +25,12 @@ from rest_framework.permissions import AllowAny
 
 urlpatterns = [
     path(
-        "admin/statistics/",
+        "agrigate/admin/statistics/",
         admin.site.admin_view(admin_statistics_view),
         name="admin-statistics"
     ),
-    path('admin/', admin.site.urls),
-    path('', include('shop.urls')),
+    path('agrigate/admin/', admin.site.urls),
+    path('agrigate/', include('shop.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
@@ -50,5 +50,5 @@ schema_view = get_schema_view(
     permission_classes=(AllowAny,)
 )
 urlpatterns += [
-    path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-docs'),
+    path('agrigate/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-docs'),
 ]

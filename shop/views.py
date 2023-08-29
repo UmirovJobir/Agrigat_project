@@ -7,6 +7,8 @@ from django.core.paginator import Paginator
 from rest_framework.pagination import PageNumberPagination
 from shop.pagination import PaginationHandlerMixin
 import json
+from django.views import generic
+
 import math
 from .models import (
     User,
@@ -366,3 +368,13 @@ class UpdateProductByGroupId(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+#webappbot
+class IndexViewWebAppBot(generic.ListView):
+    model = User
+    template_name = 'index.html'
+
+#example
+class IndexViewExample(generic.ListView):
+    model = User
+    template_name = 'example.html'
