@@ -46,8 +46,8 @@ class Category(models.Model):
 
 class TelegramGroupChannel(models.Model):
     TYPE = (
-        ('1', 'Group'),
-        ('2', 'Channel'),
+        ('Group', 'Group'),
+        ('Channel', 'Channel'),
     )
     chat_id = models.BigIntegerField()
     name    = models.CharField(max_length=200)
@@ -89,10 +89,10 @@ class UsefulCategory(models.Model):
 
 class UsefulCatalog(models.Model):
     TYPE = (
-        ('1', 'Bot'),
-        ('2', 'Group'),
-        ('3', 'Channel'),
-        ('4', 'Website'),
+        ('Bot', 'Bot'),
+        ('Group', 'Group'),
+        ('Channel', 'Channel'),
+        ('Website', 'Website'),
     )
 
     name     = models.CharField(max_length=200)

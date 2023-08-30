@@ -46,197 +46,67 @@ class ProductUserView(generics.ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class OnlyCategory(APIView):
-    def get(self, request):
-        category_id = self.request.query_params.get("id")
-    
-        if category_id=='' or category_id==None:
-            categories = Category.objects.filter(parent=None)
-        else:
-            categories = Category.objects.filter(parent=category_id)
-        
-        queryset = get_query_by_header(self, categories)
-        category_serializer = CategorySerializer(queryset, many=True)
+class ParentCategoryView(generics.ListAPIView):
+    queryset = Category.objects.all().select_related('parent')
+    serializer_class = CategorySerializer
 
-        if category_id=='':
-            return Response(data={"categories": category_serializer.data,})
-        else:
-            category_name = Category.objects.get(id=category_id)
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset().filter(parent=None)
+        queryset = get_query_by_header(self, queryset)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class SubCategoryView(generics.RetrieveAPIView):
+    queryset = Category.objects.all().select_related('parent')
+    serializer_class = CategorySerializer
+
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+        parent_category_name = get_query_by_header(self, self.get_queryset().get(id=pk).name)
+        subcategories = get_query_by_header(self, self.get_queryset().filter(parent=pk))
+        serializer = self.get_serializer(subcategories, many=True)
+        return Response({"parent_category_id": pk,
+                         "parent_category_name": parent_category_name,  
+                         "subcategories": serializer.data,})
             
-            try:
-                parent_id = category_name.parent.id
-            except AttributeError:
-                parent_id = None
-
-            return Response(data={
-                "parent_id": parent_id,
-                "categories": category_serializer.data,}
-                )
-    
-    # def get(self, request):
-    #     try:
-    #         lan = request.META['HTTP_LAN']
-    #     except:
-    #         return Response(
-    #         data={"error": "lan does not exist!"}, 
-    #         status=status.HTTP_400_BAD_REQUEST
-    #         )
-    #     category_id = self.request.query_params.get("id")
-        
-    #     if category_id is None:
-    #         return Response(data={"error":"query_params is not given"}, status=status.HTTP_400_BAD_REQUEST)
-    #     else:
-    #         if category_id=='':
-    #             categories = Category.objects.filter(parent=None)
-    #         else:
-    #             categories = Category.objects.filter(parent=category_id)
-                
-    #         category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
-
-    #         if category_id=='':
-    #             return Response(data={"categories": category_serializer.data,})
-    #         else:
-    #             category_name = Category.objects.get(id=category_id)
-                
-    #             try:
-    #                 parent_id = category_name.parent.id
-    #             except AttributeError:
-    #                 parent_id = None
-
-    #             return Response(data={
-    #                 "parent_id": parent_id,
-    #                 "category_name":category_name.name[f'{lan}'],
-    #                 "categories": category_serializer.data,}
-    #                 )
             
 class BasicPagination(PageNumberPagination):
     page_size_query_param = 'limit'
 
-class ParentCategoryView(generics.ListAPIView):    
-    pagination_class = BasicPagination
-    serializer_class = CategorySerializer
-
-    def get_queryset(self):
-        queryset = Category.objects.filter(parent__isnull=True).select_related('parent')
-        return get_query_by_header(self, queryset)
-
-
-    # def get(self, request, format=None, *args, **kwargs):
-    #     categories = Category.objects.filter(parent=None).select_related('parent')
-    #     queryset = get_query_by_header(self, categories)
-    #     category_serializer = CategorySerializer(queryset, many=True)
-    #     return Response(category_serializer.data)
-
-        # try:
-        #     lan = request.META['HTTP_LAN']
-        # except:
-        #     return Response(
-        #     data={"error": "lan does not exist!"}, 
-        #     status=status.HTTP_400_BAD_REQUEST
-        #     )
-
-        # categories = Category.objects.filter(parent=None).select_related('parent')
-        # category_serializer = CategorySerializer(categories, many=True, context={'lan': lan,})
-
-        # products = Product.objects.all().select_related('product_user').prefetch_related('categories')
-        # page = self.paginate_queryset(products)
-
-        # if page is not None:
-        #     product_serializer = self.get_paginated_response(self.serializer_class(page, many=True).data)
-        # else:
-        #     product_serializer = self.serializer_class(products, many=True)
-        
-        # return Response(data={
-        #                 "categories":category_serializer.data, 
-        #                 "products":product_serializer.data,
-        #                 }, status=status.HTTP_200_OK)
-
-
-class CategoryProductView(APIView):
-    def get(self, request, pk: int):
-        try:
-            lan = request.META['HTTP_LAN']
-        except:
-            return Response(
-            data={"error": "lan does not exist!"}, 
-            status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        category_name = Category.objects.get(id=pk).name[f'{lan}']
-
-        categories = Category.objects.filter(parent=pk)
-        if len(categories)==0:
-            products = Product.objects.filter(category=pk).select_related('product_user').distinct()
-        else:
-            products = Product.objects.filter(category__in=categories).select_related('product_user').distinct()
-            if len(products)==0:
-                categories_in = Category.objects.filter(parent__in=categories)
-                products = Product.objects.filter(category__in=categories_in).select_related('product_user').distinct()
-        product_serializer = ProductSerializer(products, many=True)
-
-        
-        category_serializer = CategorySerializer(categories, many=True)
-        return Response(data={
-                        "category_name":category_name,
-                        "categories":category_serializer.data, 
-                        "product_count":len(products),
-                        "products":product_serializer.data}
-                        )
-
       
-class ProductView(APIView, PaginationHandlerMixin):
-    pagination_class = BasicPagination
+class ProductView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
 
-    def get(self, request):
-        group_id = request.GET.get('group_id')
-        message_id = request.GET.get('message_id')
-        
-        if (group_id==None) and (message_id==None):
-            products = Product.objects.all().select_related('product_user').prefetch_related('categories__parent').order_by('-id')
-            page = self.paginate_queryset(products)
+    def get_queryset(self):
+        queryset = Product.objects.all().select_related('product_user', 'group_channel').prefetch_related('categories')
 
-            if page is not None:
-                serializer = self.get_paginated_response(self.serializer_class(page, many=True).data)
-            else:
-                serializer = self.serializer_class(products, many=True)
-        else:
-            products = get_object_or_404(Product, group__group_id=group_id, message_id=message_id)
-            serializer = ProductSerializer(products)
-        return Response(serializer.data)
+        chat_id = self.request.query_params.get('chat_id')
+        message_id = self.request.query_params.get('message_id')
 
-    def delete(self, request):
-        group_id = request.GET.get('group_id')
-        message_id = request.GET.get('message_id')
-        
-        if (group_id!=None) and (message_id!=None):
-            products = get_object_or_404(Product, group__group_id=group_id, message_id=message_id)
-            products.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(data={"error":"group_id and message_id is not given in params!"},status=status.HTTP_400_BAD_REQUEST)
+        if chat_id!=None and message_id!=None:
+            queryset = queryset.filter(group_channel__chat_id=chat_id, message_id=message_id)
+            
+        return queryset
 
-    def post(self, request):
 
-        group, created_group = Group.objects.get_or_create(
-            group_id = request.data['group']['group_id'],
-            group_name = request.data['group']['group_name'],
-            group_link = request.data['group']['group_link'],
-        )
+    def create(self, request, *args, **kwargs):
+        group_channel, created_group = TelegramGroupChannel.objects.get_or_create(
+            chat_id = request.data['group_channel']['chat_id'],
+            name = request.data['group_channel']['name'],
+            link = request.data['group_channel']['link'],)
 
         product_user, created_product = ProductUser.objects.get_or_create(
             user_id = request.data['product_user']['user_id'], 
             user_name = request.data['product_user']['user_name'],
             user_link = request.data['product_user']['user_link'],
-            phone_number = request.data['product_user']['phone_number'],
-        )
-
+            phone_number = request.data['product_user']['phone_number'],)
 
         try:
             product = Product.objects.get(product_user=product_user, message_text=request.data['message_text'])
-
             if product:
-                product.group = group
+                product.group_channel = group_channel
                 product.message_id = request.data['message_id']
                 product.datetime = request.data['datetime']
                 product.save()
@@ -246,10 +116,9 @@ class ProductView(APIView, PaginationHandlerMixin):
         except (Product.DoesNotExist) as e:
             product = Product.objects.create(
                 product_user = product_user,
-                group = group,
+                group_channel = group_channel,
                 message_id = request.data['message_id'],
                 message_text = request.data['message_text'],
-                media_file = request.data['media_file'],
                 datetime = request.data['datetime'],
             )
             for category in request.data['categories']:
@@ -257,7 +126,20 @@ class ProductView(APIView, PaginationHandlerMixin):
 
             serializer = ProductSerializer(product)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-            
+
+
+    # def delete(self, request):
+    #     group_id = request.GET.get('group_id')
+    #     message_id = request.GET.get('message_id')
+        
+    #     if (group_id!=None) and (message_id!=None):
+    #         products = get_object_or_404(Product, group__group_id=group_id, message_id=message_id)
+    #         products.delete()
+    #         return Response(status=status.HTTP_204_NO_CONTENT)
+    #     else:
+    #         return Response(data={"error":"group_id and message_id is not given in params!"},status=status.HTTP_400_BAD_REQUEST)
+
+    
 
 
 class ProductDetailView(APIView):

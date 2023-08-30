@@ -1,5 +1,4 @@
 from rest_framework import serializers
-import json
 from .models import (
     Category,
     Product,
@@ -8,15 +7,6 @@ from .models import (
     TelegramGroupChannel
 )
 
-# def attempt_json_deserialize(data, expect_type=None):
-#     try:
-#         data = json.loads(data)
-#     except (TypeError, json.decoder.JSONDecodeError): pass
-
-#     if expect_type is not None and not isinstance(data, expect_type):
-#         raise ValueError(f"Got {type(data)} but expected {expect_type}.")
-
-#     return data
 
 class BotUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,7 +28,7 @@ class GroupChannelSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     product_user = ProductUserSerializer()
-    group = GroupChannelSerializer()
+    group_channel = GroupChannelSerializer()
 
     class Meta:
         model = Product
@@ -49,7 +39,7 @@ class CategorySerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField('product_len')
 
     def product_len(self, obj):
-        print(obj.products.all().count())
+        # print(obj.products.all().count())
         return f'{obj}'
     
         # categories = Category.objects.filter(parent=category.id).distinct()
