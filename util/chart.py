@@ -3,7 +3,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from urllib.parse import urlencode
 from django.shortcuts import render
 from django.http import JsonResponse
-from shop.models import Product, Group, User
+from shop.models import Product, TelegramGroupChannel, BotUser
 import json
 
 
@@ -40,7 +40,7 @@ def get_days(request, month):
 @staff_member_required
 def get_products_len_in_a_day_by_groups(request, month, day):
     products = Product.objects.filter(datetime__month=month, datetime__day=day)
-    groups = Group.objects.filter(group__in=products).distinct()
+    groups = TelegramGroupChannel.objects.filter(group__in=products).distinct()
 
     data = {}
     for group in groups:

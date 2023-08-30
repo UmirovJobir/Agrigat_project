@@ -16,11 +16,11 @@ class CustomAdminSite(admin.AdminSite):
         app_list = super().get_app_list(request)
         app_list += [
             {
-                "name": "Custom page",
+                "name": "Статистика",
                 "app_label": "custom_page",
                 "models": [
                     {
-                        "name": "Statistics",
+                        "name": "Статистики",
                         "object_name": "statistics",
                         "admin_url": "/agrigate/admin/statistics",
                         "view_only": True,

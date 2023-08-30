@@ -1,149 +1,155 @@
-from http.client import NOT_FOUND
-from django.shortcuts import render, get_object_or_404
-from rest_framework.views import APIView
-from rest_framework import status
-from rest_framework.response import Response
-from django.core.paginator import Paginator
-from rest_framework.pagination import PageNumberPagination
-from shop.pagination import PaginationHandlerMixin
-import json
 from django.views import generic
+from django.utils import translation
+from django.shortcuts import get_object_or_404
 
-import math
+from rest_framework import status, generics
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+
+from shop.pagination import PaginationHandlerMixin
+
 from .models import (
-    User,
+    BotUser,
     ProductUser,
     Category, 
     Product,  
-    KeyWords,
-    Group
-    )
+    TelegramGroupChannel,
+)
 from .serializers import (
-    UserSerializer,
+    BotUserSerializer,
     ProductUserSerializer,
     CategorySerializer, 
     ProductSerializer, 
-    KeyWordsSerializer,
-    KeyWordsPostSerializer,
-    )
+)
+
+def get_query_by_header(self, queryset):
+    if 'HTTP_LAN' in self.request.META:
+        lang = self.request.META['HTTP_LAN']
+        translation.activate(lang)
+    return queryset
 
 
-class UserView(APIView):
-    def get(self, request):
-        user = User.objects.all()
-        serializer = UserSerializer(user, many=True)
-        return Response(serializer.data)
-        
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                serializer.data, 
-                status=status.HTTP_201_CREATED
-            )
-        return Response(
-            serializer.errors, 
-            status=status.HTTP_400_BAD_REQUEST
-            )
+class BotUserView(generics.ListCreateAPIView):
+    queryset = BotUser.objects.all()
+    serializer_class = BotUserSerializer
 
-class ProductUserView(APIView):
-    def get(self, request):
-        user = ProductUser.objects.all()
-        serializer = ProductUserSerializer(user, many=True)
-        return Response(serializer.data)
-        
-    def post(self, request):
-        user_id = request.data["user_id"]
-        try:
-            ProductUser.objects.get(user_id = user_id)
-            return Response(
-                    data={"error": "user_id is exist"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-        except ProductUser.DoesNotExist:
-            serializer = ProductUserSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(
-                    serializer.data, 
-                    status=status.HTTP_201_CREATED
-                )
-            return Response(
-                serializer.errors, 
-                status=status.HTTP_400_BAD_REQUEST
-                )
+
+class ProductUserView(generics.ListCreateAPIView):
+    queryset = ProductUser.objects.all()
+    serializer_class = ProductUserSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class OnlyCategory(APIView):
     def get(self, request):
-        try:
-            lan = request.META['HTTP_LAN']
-        except:
-            return Response(
-            data={"error": "lan does not exist!"}, 
-            status=status.HTTP_400_BAD_REQUEST
-            )
         category_id = self.request.query_params.get("id")
-        
-        if category_id is None:
-            return Response(data={"error":"query_params is not given"}, status=status.HTTP_400_BAD_REQUEST)
+    
+        if category_id=='' or category_id==None:
+            categories = Category.objects.filter(parent=None)
         else:
-            if category_id=='':
-                categories = Category.objects.filter(parent=None)
-            else:
-                categories = Category.objects.filter(parent=category_id)
-                
-            category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
+            categories = Category.objects.filter(parent=category_id)
+        
+        queryset = get_query_by_header(self, categories)
+        category_serializer = CategorySerializer(queryset, many=True)
 
-            if category_id=='':
-                return Response(data={"categories": category_serializer.data,})
-            else:
-                category_name = Category.objects.get(id=category_id)
-                
-                try:
-                    parent_id = category_name.parent.id
-                except AttributeError:
-                    parent_id = None
+        if category_id=='':
+            return Response(data={"categories": category_serializer.data,})
+        else:
+            category_name = Category.objects.get(id=category_id)
+            
+            try:
+                parent_id = category_name.parent.id
+            except AttributeError:
+                parent_id = None
 
-                return Response(data={
-                    "parent_id": parent_id,
-                    "category_name":category_name.name[f'{lan}'],
-                    "categories": category_serializer.data,}
-                    )
+            return Response(data={
+                "parent_id": parent_id,
+                "categories": category_serializer.data,}
+                )
+    
+    # def get(self, request):
+    #     try:
+    #         lan = request.META['HTTP_LAN']
+    #     except:
+    #         return Response(
+    #         data={"error": "lan does not exist!"}, 
+    #         status=status.HTTP_400_BAD_REQUEST
+    #         )
+    #     category_id = self.request.query_params.get("id")
+        
+    #     if category_id is None:
+    #         return Response(data={"error":"query_params is not given"}, status=status.HTTP_400_BAD_REQUEST)
+    #     else:
+    #         if category_id=='':
+    #             categories = Category.objects.filter(parent=None)
+    #         else:
+    #             categories = Category.objects.filter(parent=category_id)
+                
+    #         category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
+
+    #         if category_id=='':
+    #             return Response(data={"categories": category_serializer.data,})
+    #         else:
+    #             category_name = Category.objects.get(id=category_id)
+                
+    #             try:
+    #                 parent_id = category_name.parent.id
+    #             except AttributeError:
+    #                 parent_id = None
+
+    #             return Response(data={
+    #                 "parent_id": parent_id,
+    #                 "category_name":category_name.name[f'{lan}'],
+    #                 "categories": category_serializer.data,}
+    #                 )
             
 class BasicPagination(PageNumberPagination):
     page_size_query_param = 'limit'
 
-class ParentCategoryView(APIView, PaginationHandlerMixin):    
+class ParentCategoryView(generics.ListAPIView):    
     pagination_class = BasicPagination
-    serializer_class = ProductSerializer
+    serializer_class = CategorySerializer
+
+    def get_queryset(self):
+        queryset = Category.objects.filter(parent__isnull=True).select_related('parent')
+        return get_query_by_header(self, queryset)
 
 
-    def get(self, request, format=None, *args, **kwargs):
-        try:
-            lan = request.META['HTTP_LAN']
-        except:
-            return Response(
-            data={"error": "lan does not exist!"}, 
-            status=status.HTTP_400_BAD_REQUEST
-            )
+    # def get(self, request, format=None, *args, **kwargs):
+    #     categories = Category.objects.filter(parent=None).select_related('parent')
+    #     queryset = get_query_by_header(self, categories)
+    #     category_serializer = CategorySerializer(queryset, many=True)
+    #     return Response(category_serializer.data)
 
-        categories = Category.objects.filter(parent=None).select_related('parent')
-        category_serializer = CategorySerializer(categories, many=True, context={'lan': lan,})
+        # try:
+        #     lan = request.META['HTTP_LAN']
+        # except:
+        #     return Response(
+        #     data={"error": "lan does not exist!"}, 
+        #     status=status.HTTP_400_BAD_REQUEST
+        #     )
 
-        products = Product.objects.all().select_related('product_user').prefetch_related('categories')
-        page = self.paginate_queryset(products)
+        # categories = Category.objects.filter(parent=None).select_related('parent')
+        # category_serializer = CategorySerializer(categories, many=True, context={'lan': lan,})
 
-        if page is not None:
-            product_serializer = self.get_paginated_response(self.serializer_class(page, many=True).data)
-        else:
-            product_serializer = self.serializer_class(products, many=True)
+        # products = Product.objects.all().select_related('product_user').prefetch_related('categories')
+        # page = self.paginate_queryset(products)
+
+        # if page is not None:
+        #     product_serializer = self.get_paginated_response(self.serializer_class(page, many=True).data)
+        # else:
+        #     product_serializer = self.serializer_class(products, many=True)
         
-        return Response(data={
-                        "categories":category_serializer.data, 
-                        "products":product_serializer.data,
-                        }, status=status.HTTP_200_OK)
+        # return Response(data={
+        #                 "categories":category_serializer.data, 
+        #                 "products":product_serializer.data,
+        #                 }, status=status.HTTP_200_OK)
 
 
 class CategoryProductView(APIView):
@@ -169,73 +175,13 @@ class CategoryProductView(APIView):
         product_serializer = ProductSerializer(products, many=True)
 
         
-        category_serializer = CategorySerializer(categories, many=True, context={'lan': lan})
+        category_serializer = CategorySerializer(categories, many=True)
         return Response(data={
                         "category_name":category_name,
                         "categories":category_serializer.data, 
                         "product_count":len(products),
                         "products":product_serializer.data}
                         )
-
-
-class KeyWordIDView(APIView):
-    def get(self, request, pk: int):
-        lan = request.META['HTTP_LAN']
-        key_words = KeyWords.objects.filter(category=pk)
-        serializer = KeyWordsSerializer(
-            key_words, 
-            many=True, 
-            context={'lan': lan}
-            )
-        data = serializer.data
-        data = json.loads(json.dumps(data))
-        response = []
-        for i in data:
-            if i['key_words'] != None:
-                response.append(i)
-        return Response(response)
-
-class CheckKeywordByWord(APIView):
-    def get(self, request):
-        lan = request.META['HTTP_LAN']
-        word = self.request.query_params.get("word")
-        key_words = KeyWords.objects.filter(key_words={lan:word})
-        serializer = KeyWordsSerializer(
-            key_words, 
-            many=True, 
-            context={'lan': lan}
-            )
-        data = serializer.data
-        data = json.loads(json.dumps(data))
-        response = []
-        for i in data:
-            if i['key_words'] != None:
-                response.append(i)
-        return Response(response)
-
-class KeyWordView(APIView):
-    def post(self, request):
-        try:
-            lan = request.META['HTTP_LAN']
-        except:
-            return Response(
-            data={"error": "lan does not exist!"}, 
-            status=status.HTTP_400_BAD_REQUEST
-            )
-        data = request.data
-        data = json.loads(json.dumps(data))
-        data['key_words'] = {lan:data['key_words']}
-        serializer = KeyWordsPostSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                serializer.data, 
-                status=status.HTTP_201_CREATED
-            )
-        return Response(
-            serializer.errors, 
-            status=status.HTTP_400_BAD_REQUEST
-            )
 
       
 class ProductView(APIView, PaginationHandlerMixin):
@@ -371,10 +317,10 @@ class UpdateProductByGroupId(APIView):
 
 #webappbot
 class IndexViewWebAppBot(generic.ListView):
-    model = User
+    model = BotUser
     template_name = 'index.html'
 
 #example
 class IndexViewExample(generic.ListView):
-    model = User
+    model = BotUser
     template_name = 'example.html'

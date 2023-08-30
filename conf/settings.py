@@ -36,29 +36,33 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'modeltranslation',
     'conf.apps.CustomAdminConfig',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'shop',  #app
+    
     'rest_framework',
     'debug_toolbar', #debuger
     "phonenumber_field", #get phone number
     "django_json_widget",
-    "drf_yasg"
+    "drf_yasg",
+    
+    'shop',  #app
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware", #debug_toolbar
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 INTERNAL_IPS = [
@@ -123,7 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'uz'
 
 TIME_ZONE = 'Asia/Tashkent'
 
@@ -137,19 +141,29 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/agrigate/static/'
+STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 
-MEDIA_URL = '/agrigate/media/'
+MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media/'
 
 ADMINS = (
     ('admin', 'jobirumirovmoliya@gmail.com'),
 )
 
-
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
 }
+
+
+LANGUAGES = (
+    ('uz', 'Uzbek'),
+    ('kk', 'Cyrillic'),
+    ('ru', 'Russian'),
+)
+
+
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz'
+MODELTRANSLATION_LANGUAGES = ('uz','kk','ru')
