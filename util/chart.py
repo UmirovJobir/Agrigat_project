@@ -3,7 +3,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from urllib.parse import urlencode
 from django.shortcuts import render
 from django.http import JsonResponse
-from shop.models import Product, TelegramGroupChannel, BotUser
+from shop.models import Advertisement, TelegramGroupChannel, BotUser
 import json
 
 
@@ -19,7 +19,7 @@ import json
 
 @staff_member_required
 def get_months(request):
-    products = Product.objects.annotate(month=ExtractMonth("datetime")).values("month").order_by("month").distinct()
+    products = Advertisement.objects.annotate(month=ExtractMonth("datetime")).values("month").order_by("month").distinct()
     months = [product["month"] for product in products]
     
     return JsonResponse({
@@ -28,7 +28,7 @@ def get_months(request):
 
 @staff_member_required
 def get_days(request, month):
-    products = Product.objects.filter(datetime__month=month)
+    products = Advertisement.objects.filter(datetime__month=month)
     days_group = products.annotate(day=ExtractDay("datetime")).values("day").order_by("day").distinct()
     days = [product["day"] for product in days_group]
 
@@ -39,7 +39,7 @@ def get_days(request, month):
 
 @staff_member_required
 def get_products_len_in_a_day_by_groups(request, month, day):
-    products = Product.objects.filter(datetime__month=month, datetime__day=day)
+    products = Advertisement.objects.filter(datetime__month=month, datetime__day=day)
     groups = TelegramGroupChannel.objects.filter(group__in=products).distinct()
 
     data = {}

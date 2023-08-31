@@ -1,7 +1,25 @@
 from django.db import models
 from datetime import datetime
 from phonenumber_field.modelfields import PhoneNumberField
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import Group, User
 
+
+class User(User):
+    pass
+
+    class Meta:
+        app_label = 'shop'
+        verbose_name=_("Adminstrator") #('Пользователь бота')
+        verbose_name_plural=_("Adminstratorlar") #('Пользователи бота')
+
+class Group(Group):
+    pass
+
+    class Meta:
+        app_label = 'shop'
+        verbose_name=_("Adminstratorlar guruhi") #('Пользователь бота')
+        verbose_name_plural=_("Adminstratorlar guruhi") #('Пользователи бота')
 
 class BotUser(models.Model):
     user_id      = models.PositiveBigIntegerField(unique=True)
@@ -14,11 +32,11 @@ class BotUser(models.Model):
         return self.user_name
 
     class Meta:
-        verbose_name='Пользователь бота'
-        verbose_name_plural='Пользователи бота'
+        verbose_name=_("Bot foydalanuvchisi") #('Пользователь бота')
+        verbose_name_plural=_("Bot foydalanuvchilari") #('Пользователи бота')
 
 
-class ProductUser(models.Model):
+class AdsUser(models.Model):
     user_id     = models.BigIntegerField(unique=True)
     user_name   = models.CharField(max_length=100)
     user_link   = models.CharField(max_length=100, null=True, blank=True)
@@ -28,17 +46,17 @@ class ProductUser(models.Model):
         return self.user_name
     
     class Meta:
-        verbose_name='Пользователь продукта'
-        verbose_name_plural='Пользователи продукта'
+        verbose_name=_("E'lon foydalanuvchisi") #('Пользователь продукта')
+        verbose_name_plural=_("E'lon foydalanuvchilari")
 
 
-class Category(models.Model):
-    name   = models.CharField(max_length=100)
+class AdsCategory(models.Model):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='subcategories', null=True, blank=True)
+    name   = models.CharField(max_length=100)
     
     class Meta:
-        verbose_name='Категория'
-        verbose_name_plural='Категории'
+        verbose_name=_("E'lon toifasi") #('Категория')
+        verbose_name_plural=_("E'lon toifalari") #('Категории')
     
     def __str__(self) -> str:
         return self.name
@@ -46,8 +64,8 @@ class Category(models.Model):
 
 class TelegramGroupChannel(models.Model):
     TYPE = (
-        ('1', 'Group'),
-        ('2', 'Channel'),
+        ('Group', _('Gruppa')),
+        ('Channel', _('Kanal')),
     )
     chat_id = models.BigIntegerField()
     name    = models.CharField(max_length=200)
@@ -58,41 +76,41 @@ class TelegramGroupChannel(models.Model):
         return f"{self.chat_id, self.name}"
     
     class Meta:
-        verbose_name='Телеграм Группа или Канал'
-        verbose_name_plural='Телеграм Группы или Каналы'
+        verbose_name=_("Telegram gruppa/kanal") #('Телеграм Группа или Канал')
+        verbose_name_plural=_("Telegram gruppalar/kanallar")
 
 
-class Product(models.Model):
-    product_user = models.ForeignKey(ProductUser, related_name='product_user', on_delete=models.CASCADE, null=True, blank=True)
-    categories = models.ManyToManyField(Category, related_name='products', blank=True)
+class Advertisement(models.Model):
+    ads_user = models.ForeignKey(AdsUser, related_name='ads_user'   , on_delete=models.CASCADE, null=True, blank=True)
+    categories = models.ManyToManyField(AdsCategory, related_name='advertisements', blank=True)
     group_channel = models.ForeignKey(TelegramGroupChannel, related_name='group_channel', on_delete=models.CASCADE, null=True, blank=True)
     message_id = models.BigIntegerField()
     message_text = models.TextField()
     datetime = models.DateTimeField(default=datetime.now, blank=True)
-    
+
     class Meta:
-        verbose_name='Продукт'
-        verbose_name_plural='Продукты'
+        verbose_name=_("E'lon") #('Продукт')
+        verbose_name_plural=_("E'lonlar") #('Продукты')
 
 
 class UsefulCategory(models.Model):
-    name   = models.CharField(max_length=100)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='useful_subcategories', null=True, blank=True)
+    name   = models.CharField(max_length=100)
     
     def __str__(self) -> str:
         return self.name
     
     class Meta:
-        verbose_name='Полезная категория'
-        verbose_name_plural='Полезные категории'
+        verbose_name=_("Foydali toifa") #('Полезная категория')
+        verbose_name_plural=_("Foydali toifalar") #('Полезные категории')
 
 
 class UsefulCatalog(models.Model):
     TYPE = (
-        ('1', 'Bot'),
-        ('2', 'Group'),
-        ('3', 'Channel'),
-        ('4', 'Website'),
+        ('Bot', _('Bot')),
+        ('Group', _('Gruppa')),
+        ('Channel', _('Kanal')),
+        ('Website', _('Websayt')),
     )
 
     name     = models.CharField(max_length=200)
@@ -101,5 +119,5 @@ class UsefulCatalog(models.Model):
     category = models.ForeignKey(UsefulCategory, on_delete=models.CASCADE, related_name='useful_category', blank=True)
 
     class Meta:
-        verbose_name='Полезный каталог'
-        verbose_name_plural='Полезные каталоги'
+        verbose_name=_("Foydali manba") #('Полезный каталог')
+        verbose_name_plural=_("Foydali manbalar") #('Полезные каталоги')

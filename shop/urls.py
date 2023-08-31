@@ -4,11 +4,11 @@ from django.conf import settings
 from .views import (
     BotUserView,
     ProductUserView,
-    OnlyCategory,
-    ParentCategoryView, 
-    CategoryProductView,
-    ProductView,
-    ProductDetailView,
+    ParentCategoryView,
+    SubCategoryView,
+    ParentCategoryView,
+    AdvertisementView,
+    AdvertisementDetailView,
     UpdateProductByGroupId,
     IndexViewWebAppBot,
     IndexViewExample
@@ -20,12 +20,11 @@ urlpatterns = [
     path('user/', BotUserView.as_view()),
     path('product_user/', ProductUserView.as_view()),
     
-    path('catagory_name/', OnlyCategory.as_view()),
     path('category/', ParentCategoryView.as_view()),
-    path('category/<int:pk>/', CategoryProductView.as_view()),
+    path('category/<int:pk>/', SubCategoryView.as_view()),
 
-    path('product/', ProductView.as_view()),
-    path('product/<int:pk>/', ProductDetailView.as_view()),
+    path('advertisement/', AdvertisementView.as_view()),
+    path('advertisement/<int:pk>/', AdvertisementDetailView.as_view()),
 
     path('update_by_group_id/', UpdateProductByGroupId.as_view()),
     
