@@ -1,8 +1,14 @@
 from modeltranslation.translator import register, TranslationOptions
 from .models import (
-    Category,
+    AdsCategory,
+    UsefulCategory,
 )
 
-@register(Category)
-class CategoryTranslationOptions(TranslationOptions):
+@register(AdsCategory)
+class AdsCategoryTranslationOptions(TranslationOptions):
+    fields = ['name']
+
+
+@register(UsefulCategory)
+class UsefulCategoryTranslationOptions(TranslationOptions):
     fields = ['name']

@@ -7,8 +7,8 @@ from .views import (
     ParentCategoryView,
     SubCategoryView,
     ParentCategoryView,
-    ProductView,
-    ProductDetailView,
+    AdvertisementView,
+    AdvertisementDetailView,
     UpdateProductByGroupId,
     IndexViewWebAppBot,
     IndexViewExample
@@ -23,8 +23,8 @@ urlpatterns = [
     path('category/', ParentCategoryView.as_view()),
     path('category/<int:pk>/', SubCategoryView.as_view()),
 
-    path('product/', ProductView.as_view()),
-    path('product/<int:pk>/', ProductDetailView.as_view()),
+    path('advertisement/', AdvertisementView.as_view()),
+    path('advertisement/<int:pk>/', AdvertisementDetailView.as_view()),
 
     path('update_by_group_id/', UpdateProductByGroupId.as_view()),
     

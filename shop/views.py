@@ -11,16 +11,16 @@ from shop.pagination import PaginationHandlerMixin
 
 from .models import (
     BotUser,
-    ProductUser,
-    Category, 
-    Product,  
+    AdsUser,
+    AdsCategory, 
+    Advertisement,  
     TelegramGroupChannel,
 )
 from .serializers import (
     BotUserSerializer,
-    ProductUserSerializer,
+    AdsUserSerializer,
     CategorySerializer, 
-    ProductSerializer, 
+    AdsSerializer, 
 )
 
 def get_query_by_header(self, queryset):
@@ -36,8 +36,8 @@ class BotUserView(generics.ListCreateAPIView):
 
 
 class ProductUserView(generics.ListCreateAPIView):
-    queryset = ProductUser.objects.all()
-    serializer_class = ProductUserSerializer
+    queryset = AdsUser.objects.all()
+    serializer_class = AdsUserSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -47,7 +47,7 @@ class ProductUserView(generics.ListCreateAPIView):
 
 
 class ParentCategoryView(generics.ListAPIView):
-    queryset = Category.objects.all().select_related('parent')
+    queryset = AdsCategory.objects.all().select_related('parent')
     serializer_class = CategorySerializer
 
     def get(self, request, *args, **kwargs):
@@ -59,7 +59,7 @@ class ParentCategoryView(generics.ListAPIView):
 
 
 class SubCategoryView(generics.RetrieveAPIView):
-    queryset = Category.objects.all().select_related('parent')
+    queryset = AdsCategory.objects.all().select_related('parent')
     serializer_class = CategorySerializer
 
     def get(self, request, *args, **kwargs):
@@ -76,11 +76,11 @@ class BasicPagination(PageNumberPagination):
     page_size_query_param = 'limit'
 
       
-class ProductView(generics.ListCreateAPIView):
-    serializer_class = ProductSerializer
+class AdvertisementView(generics.ListCreateAPIView):
+    serializer_class = AdsSerializer
 
     def get_queryset(self):
-        queryset = Product.objects.all().select_related('product_user', 'group_channel').prefetch_related('categories')
+        queryset = Advertisement.objects.all().select_related('ads_user', 'group_channel').prefetch_related('categories')
 
         chat_id = self.request.query_params.get('chat_id')
         message_id = self.request.query_params.get('message_id')
@@ -92,39 +92,39 @@ class ProductView(generics.ListCreateAPIView):
 
 
     def create(self, request, *args, **kwargs):
-        group_channel, created_group = TelegramGroupChannel.objects.get_or_create(
+        group_channel, created_group_channel = TelegramGroupChannel.objects.get_or_create(
             chat_id = request.data['group_channel']['chat_id'],
             name = request.data['group_channel']['name'],
             link = request.data['group_channel']['link'],)
 
-        product_user, created_product = ProductUser.objects.get_or_create(
-            user_id = request.data['product_user']['user_id'], 
-            user_name = request.data['product_user']['user_name'],
-            user_link = request.data['product_user']['user_link'],
-            phone_number = request.data['product_user']['phone_number'],)
+        ads_user, created_ads = AdsUser.objects.get_or_create(
+            user_id = request.data['ads_user']['user_id'], 
+            user_name = request.data['ads_user']['user_name'],
+            user_link = request.data['ads_user']['user_link'],
+            phone_number = request.data['ads_user']['phone_number'],)
 
         try:
-            product = Product.objects.get(product_user=product_user, message_text=request.data['message_text'])
-            if product:
-                product.group_channel = group_channel
-                product.message_id = request.data['message_id']
-                product.datetime = request.data['datetime']
-                product.save()
-                serializer = ProductSerializer(product)
+            advertisement = Advertisement.objects.get(ads_user=ads_user, message_text=request.data['message_text'])
+            if advertisement:
+                advertisement.group_channel = group_channel
+                advertisement.message_id = request.data['message_id']
+                advertisement.datetime = request.data['datetime']
+                advertisement.save()
+                serializer = AdsSerializer(advertisement)
                 return Response(serializer.data, status=status.HTTP_302_FOUND)
             
-        except (Product.DoesNotExist) as e:
-            product = Product.objects.create(
-                product_user = product_user,
+        except (Advertisement.DoesNotExist) as e:
+            advertisement = Advertisement.objects.create(
+                ads_user = ads_user,
                 group_channel = group_channel,
                 message_id = request.data['message_id'],
                 message_text = request.data['message_text'],
                 datetime = request.data['datetime'],
             )
             for category in request.data['categories']:
-                product.categories.add(category)
+                advertisement.categories.add(category)
 
-            serializer = ProductSerializer(product)
+            serializer = AdsSerializer(advertisement)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -139,24 +139,22 @@ class ProductView(generics.ListCreateAPIView):
     #     else:
     #         return Response(data={"error":"group_id and message_id is not given in params!"},status=status.HTTP_400_BAD_REQUEST)
 
-    
 
-
-class ProductDetailView(APIView):
+class AdvertisementDetailView(APIView):
     def get(self, request, pk):
-        products = get_object_or_404(Product, pk=pk)
-        product_serializer = ProductSerializer(products)
+        products = get_object_or_404(Advertisement, pk=pk)
+        product_serializer = AdsSerializer(products)
         return Response(product_serializer.data)
 
     def delete(self, request, pk):
-        products = get_object_or_404(Product, pk=pk)
+        products = get_object_or_404(Advertisement, pk=pk)
         products.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def patch(self, request, pk, format=None):
-        product = get_object_or_404(Product, pk=pk)
+        product = get_object_or_404(Advertisement, pk=pk)
 
-        group, created = Group.objects.get_or_create(
+        group, created = TelegramGroupChannel.objects.get_or_create(
             group_id = request.data['group']['group_id'],
             group_name = request.data['group']['group_name'],
             group_link = request.data['group']['group_link'],
@@ -171,7 +169,7 @@ class ProductDetailView(APIView):
         categories = []
         for category_id in request.data.get('categories'):
             try:
-                category = Category.objects.get(id=category_id)
+                category = AdsCategory.objects.get(id=category_id)
                 categories.append(category)
             except:
                 return Response(data={"error":"Category id does not exist"}, status=status.HTTP_404_NOT_FOUND)
@@ -180,7 +178,7 @@ class ProductDetailView(APIView):
 
         product.save()
 
-        serializer = ProductSerializer(product)
+        serializer = AdsSerializer(product)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
         
@@ -189,8 +187,8 @@ class UpdateProductByGroupId(APIView):
     def patch(self, request, format=None):
         group_id = request.GET.get('group_id')
         message_id = request.GET.get('message_id')
-        products = get_object_or_404(Product, group__group_id=group_id, message_id=message_id)
-        serializer = ProductSerializer(products, data=request.data, partial=True)
+        products = get_object_or_404(Advertisement, group__group_id=group_id, message_id=message_id)
+        serializer = AdsSerializer(products, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

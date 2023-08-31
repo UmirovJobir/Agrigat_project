@@ -23,7 +23,7 @@
 
 import json
 from urllib.parse import urlencode
-from shop.models import Product, Group, User
+from shop.models import Advertisement, Group, User
 
 
 users = User.objects.all()

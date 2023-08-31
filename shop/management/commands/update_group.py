@@ -1,10 +1,10 @@
 from django.core.management import BaseCommand
-from shop.models import Product, Group
+from shop.models import Advertisement, Group
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        products = Product.objects.all()
+        products = Advertisement.objects.all()
         groups = Group.objects.all()
 
         product_count = 0

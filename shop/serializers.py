@@ -1,9 +1,9 @@
 from rest_framework import serializers
 from .models import (
-    Category,
-    Product,
+    AdsCategory,
+    Advertisement,
     BotUser,
-    ProductUser,
+    AdsUser,
     TelegramGroupChannel
 )
 
@@ -14,9 +14,9 @@ class BotUserSerializer(serializers.ModelSerializer):
         fields = ['id', 'user_id', 'first_name', 'last_name', 'user_name', 'phone_number']
 
 
-class ProductUserSerializer(serializers.ModelSerializer):
+class AdsUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductUser
+        model = AdsUser
         fields = ['id', 'user_id', 'user_name', 'user_link', 'phone_number']
 
 
@@ -26,13 +26,13 @@ class GroupChannelSerializer(serializers.ModelSerializer):
         fields = ['id', 'chat_id', 'name', 'link', 'type']
 
 
-class ProductSerializer(serializers.ModelSerializer):
-    product_user = ProductUserSerializer()
+class AdsSerializer(serializers.ModelSerializer):
+    ads_user = AdsUserSerializer()
     group_channel = GroupChannelSerializer()
 
     class Meta:
-        model = Product
-        fields = ['id', 'product_user', 'categories', 'group_channel', 'message_id', 'message_text', 'datetime']
+        model = Advertisement
+        fields = ['id', 'ads_user', 'categories', 'group_channel', 'message_id', 'message_text', 'datetime']
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -55,6 +55,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
     
     class Meta:
-        model = Category
+        model = AdsCategory
         fields = 'id', 'name', 'products'
 

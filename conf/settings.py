@@ -48,15 +48,18 @@ INSTALLED_APPS = [
     'rest_framework',
     'debug_toolbar', #debuger
     "phonenumber_field", #get phone number
-    "django_json_widget",
     "drf_yasg",
+    "admin_reorder",
     
     'shop',  #app
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    "debug_toolbar.middleware.DebugToolbarMiddleware", #debug_toolbar
+    'django.middleware.locale.LocaleMiddleware', #language
+    'debug_toolbar.middleware.DebugToolbarMiddleware', #debug_toolbar
+    # 'admin_reorder.middleware.ModelAdminReorder', #admin_reorder
+    'conf.middleware.ModelAdminReorderWithNav', #admin_reorder
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -137,6 +140,19 @@ USE_L10N = True
 
 USE_TZ = True
 
+LANGUAGES = (
+    ('uz', 'Uzbek'),
+    ('kk', 'Cyrillic'),
+    # ('ru', 'Russian'),
+)
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
+]
+
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz'
+MODELTRANSLATION_LANGUAGES = ('uz','kk','ru')
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
@@ -158,12 +174,22 @@ ADMINS = (
 # }
 
 
-LANGUAGES = (
-    ('uz', 'Uzbek'),
-    ('kk', 'Cyrillic'),
-    ('ru', 'Russian'),
+ADMIN_REORDER = (
+    {'app': 'auth', 'label': 'Admin',
+     'models': (
+        {'model': 'auth.Group', 'label': 'Adminstratorlar guruhlari'},
+        {'model': 'auth.User', 'label': 'Adminstratorlar'},
+    )},
+
+    {'app': 'shop', 'label': 'Bot',
+     'models': ('shop.BotUser',)
+    },
+
+    {'app': 'shop', 'label': "E'lon",
+     'models': ('shop.TelegramGroupChannel', 'shop.AdsUser', 'shop.AdsCategory', 'shop.Advertisement')
+    },
+
+    {'app': 'shop', 'label': 'Manba',
+     'models': ('shop.UsefulCategory', 'shop.UsefulCatalog',)
+    },
 )
-
-
-MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz'
-MODELTRANSLATION_LANGUAGES = ('uz','kk','ru')
