@@ -31,8 +31,10 @@ urlpatterns = [
     path('advertisement/', AdsListCreateAPIView.as_view()),
     path('advertisement/<int:pk>/', AdsRetrieveDestroyAPIView.as_view()),
 
+    path('advertisement/<int:pk>/update/', AdvertisementPatchView.as_view()),
+
     path('advertisement_delete/', AdvertisementDeleteView.as_view()),
-    path('advertisement_patch/<int:pk>/', AdvertisementPatchView.as_view()),
+    # path('advertisement_patch/<int:pk>/', AdvertisementUpdateView.as_view()),
 
     path('advertisement_chat_id/', AdsUpdateByGroupId.as_view()),
     
