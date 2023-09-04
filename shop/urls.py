@@ -34,7 +34,7 @@ urlpatterns = [
     path('advertisement_delete/', AdvertisementDeleteView.as_view()),
     path('advertisement_patch/<int:pk>/', AdvertisementPatchView.as_view()),
 
-    path('advertisement_update/', AdsUpdateByGroupId.as_view()),
+    path('advertisement_chat_id/', AdsUpdateByGroupId.as_view()),
     
     path("get_months/", get_months, name="get-months"),
     path("get_days/<int:month>", get_days, name="get-days"),

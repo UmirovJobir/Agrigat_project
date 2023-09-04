@@ -5,9 +5,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
+# from rest_framework.pagination import PageNumberPagination
 
-from shop.pagination import PaginationHandlerMixin
+from shop.pagination import CustomPageNumberPagination
 
 from .models import (
     BotUser,
@@ -69,6 +69,7 @@ class SubCategoryView(generics.RetrieveAPIView):
    
 class AdsListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = AdsSerializer
+    pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
         queryset = Advertisement.objects.all().select_related('ads_user', 'group_channel').prefetch_related('categories')
