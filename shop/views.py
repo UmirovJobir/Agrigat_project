@@ -40,12 +40,6 @@ class AdsUserView(generics.ListCreateAPIView):
     queryset = AdsUser.objects.all()
     serializer_class = AdsUserSerializer
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 
 class ParentCategoryView(generics.ListAPIView):
     queryset = AdsCategory.objects.all().select_related('parent')
@@ -93,8 +87,9 @@ class AdsListCreateAPIView(generics.ListCreateAPIView):
             serializer = GroupChannelSerializer(data=request.data.get('group_channel'))
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                group_channel = TelegramGroupChannel.objects.get(id=serializer.data['id'])
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         if request.data.get('ads_user'):
             ads_user = AdsUser.objects.filter(
@@ -160,8 +155,9 @@ class AdvertisementPatchView(APIView):
             serializer = GroupChannelSerializer(data=request.data.get('group_channel'))
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                group_channel = TelegramGroupChannel.objects.get(id=serializer.data['id'])
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
 
         product.group_channel = group_channel
