@@ -71,12 +71,8 @@ class SubCategoryView(generics.RetrieveAPIView):
         return Response({"parent_category_id": pk,
                          "parent_category_name": parent_category_name,  
                          "subcategories": serializer.data,})
-            
-            
-class BasicPagination(PageNumberPagination):
-    page_size_query_param = 'limit'
 
-      
+   
 class AdsListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = AdsSerializer
 
