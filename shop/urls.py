@@ -23,7 +23,7 @@ from util.chart import get_months, get_days, get_products_len_in_a_day_by_groups
 
 urlpatterns = [
     path('user/', BotUserView.as_view()),
-    path('product_user/', AdsUserView.as_view()),
+    path('ads_user/', AdsUserView.as_view()),
     
     path('category/', ParentCategoryView.as_view()),
     path('category/<int:pk>/', SubCategoryView.as_view()),

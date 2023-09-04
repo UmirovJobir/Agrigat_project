@@ -145,39 +145,6 @@ class AdvertisementDeleteView(APIView):
             return Response(data={"error":"group_id and message_id is not given in params!"},status=status.HTTP_400_BAD_REQUEST)
 
 
-# class AdvertisementUpdateView(generics.UpdateAPIView):
-#     queryset = Advertisement.objects.all()
-
-#     def put(self, request, *args, **kwargs):
-#         instance = self.get_object()
-#         if request.data.get('group_channel'):
-#             group_channel = TelegramGroupChannel.objects.filter(
-#                             chat_id = request.data.get('group_channel')['chat_id'],
-#                             link    = request.data.get('group_channel')['link']).first()
-#             new_group = group_channel.pk
-#             serializer_class = AdsSerializer
-#             if group_channel==None:
-#                 serializer = GroupChannelSerializer(data=request.data.get('group_channel'))
-#                 if serializer.is_valid():
-#                     serializer.save()
-#                     new_group = serializer.data
-#                     serializer_class = AdsSerializerPost
-#                 else:
-#                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#             request.data["group_channel"] = new_group
-                
-#         serializer = serializer_class(instance, data=request.data, partial=True)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response(serializer.data)
-
-#     def patch(self, request, *args, **kwargs):
-#         instance = self.get_object()
-#         serializer = self.get_serializer(instance, data=request.data, partial=True)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()  # Perform the update
-#         return Response(serializer.data)
-
 class AdvertisementPatchView(APIView):
     def patch(self, request, pk, format=None):
         product = get_object_or_404(Advertisement, pk=pk)
