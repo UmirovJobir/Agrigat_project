@@ -3,13 +3,18 @@ from django.conf.urls.static import static
 from django.conf import settings
 from .views import (
     BotUserView,
-    ProductUserView,
+    AdsUserView,
     ParentCategoryView,
     SubCategoryView,
     ParentCategoryView,
-    AdvertisementView,
-    AdvertisementDetailView,
-    UpdateProductByGroupId,
+
+    AdsListCreateAPIView,
+    AdsRetrieveDestroyAPIView,
+    AdvertisementDeleteView,
+    AdvertisementPatchView,
+
+    AdsUpdateByGroupId,
+
     IndexViewWebAppBot,
     IndexViewExample
 )
@@ -18,15 +23,18 @@ from util.chart import get_months, get_days, get_products_len_in_a_day_by_groups
 
 urlpatterns = [
     path('user/', BotUserView.as_view()),
-    path('product_user/', ProductUserView.as_view()),
+    path('product_user/', AdsUserView.as_view()),
     
     path('category/', ParentCategoryView.as_view()),
     path('category/<int:pk>/', SubCategoryView.as_view()),
 
-    path('advertisement/', AdvertisementView.as_view()),
-    path('advertisement/<int:pk>/', AdvertisementDetailView.as_view()),
+    path('advertisement/', AdsListCreateAPIView.as_view()),
+    path('advertisement/<int:pk>/', AdsRetrieveDestroyAPIView.as_view()),
 
-    path('update_by_group_id/', UpdateProductByGroupId.as_view()),
+    path('advertisement_delete/', AdvertisementDeleteView.as_view()),
+    path('advertisement_patch/<int:pk>/', AdvertisementPatchView.as_view()),
+
+    path('advertisement_update/', AdsUpdateByGroupId.as_view()),
     
     path("get_months/", get_months, name="get-months"),
     path("get_days/<int:month>", get_days, name="get-days"),

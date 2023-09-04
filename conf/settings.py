@@ -143,7 +143,7 @@ USE_TZ = True
 LANGUAGES = (
     ('uz', 'Uzbek'),
     ('kk', 'Cyrillic'),
-    # ('ru', 'Russian'),
+    ('ru', 'Russian'),
 )
 
 LOCALE_PATHS = [

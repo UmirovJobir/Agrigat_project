@@ -38,6 +38,7 @@ class AdsUserAdmin(admin.ModelAdmin):
 class AdsCategoryAdmin(TranslationAdmin):
     list_display = ['id', 'name', 'parent']
     list_display_links = ['id', 'name']
+    list_filter = [AdsCategoryFilter]
     search_fields = ['id', 'name',]
     raw_id_fields = ['parent',]
 
@@ -45,6 +46,7 @@ class AdsCategoryAdmin(TranslationAdmin):
 @admin.register(Advertisement)
 class AdvertisementAdmin(admin.ModelAdmin):
     list_display = ['id', 'message_id', 'message_text', 'datetime']
+    list_display_links = ['id', 'message_id']
     list_filter = ['group_channel',]
     search_fields = ['message_id', 'message_text']
     raw_id_fields = ['ads_user','categories']

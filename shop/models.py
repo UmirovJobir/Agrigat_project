@@ -39,7 +39,7 @@ class BotUser(models.Model):
 class AdsUser(models.Model):
     user_id     = models.BigIntegerField(unique=True)
     user_name   = models.CharField(max_length=100)
-    user_link   = models.CharField(max_length=100, null=True, blank=True)
+    user_link   = models.CharField(max_length=100, null=True, blank=True, unique=True)
     phone_number = PhoneNumberField(null=True, blank=True)
 
     def __str__(self):
@@ -67,7 +67,7 @@ class TelegramGroupChannel(models.Model):
         ('Group', _('Gruppa')),
         ('Channel', _('Kanal')),
     )
-    chat_id = models.BigIntegerField()
+    chat_id = models.BigIntegerField(unique=True)
     name    = models.CharField(max_length=200)
     link    = models.CharField(max_length=200, null=True, blank=True, unique=True)
     type    = models.CharField(max_length=20, choices=TYPE)
