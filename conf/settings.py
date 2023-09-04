@@ -193,3 +193,8 @@ ADMIN_REORDER = (
      'models': ('shop.UsefulCategory', 'shop.UsefulCatalog',)
     },
 )
+
+TEMPLATE_LOADERS = (
+    'django.template.loaders.app_directories.Loader',
+    'django.template.loaders.filesystem.Loader',
+)

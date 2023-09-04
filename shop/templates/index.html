@@ -97,7 +97,7 @@
     </form>
 
 
-    <h1>Assalomu alaykum !!!</h1>
+    <h1>Assalomu alaykum 123546586798 !!!</h1>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         {#let tg = window.Telegram.WebApp;#}
@@ -111,8 +111,8 @@
         let BackButton = WebApp.BackButton;
         let MainButton = WebApp.MainButton;
 
-        BackButton.show();
-        MainButton.show();
+        {#BackButton.show();#}
+        {#MainButton.show();#}
 
 
         MainButton.onClick(function() {
@@ -129,7 +129,7 @@
         buy.addEventListener("click", () => {
             document.getElementById("main").style.display = "none";
             document.getElementById("form").style.display = "block";
-            document.getElementById("user_name").value = tg.initDataUnsafe.user_data;
+            document.getElementById("user_name").value = WebApp.initDataUnsafe.user.;
         });
 
         order.addEventListener("click", () => {
@@ -152,7 +152,7 @@
                 return;
             }
 
-            window.alert(11)
+            {#window.alert(11)#}
 
             let data = {
                 name:name,
@@ -166,7 +166,7 @@
               text += cars[i] + "<br>";
             }
 
-            alert(text)
+            {#alert(text)#}
 
             //document.write(JSON.stringify(data));
 
