@@ -15,6 +15,11 @@ from .views import (
 
     AdsUpdateByGroupId,
 
+    UsefulCategoryListAPIView,
+    UsefulSubCategoryView,
+    UsefulCatalogAPIView,
+    UsefulCatalogDetailAPIView,
+
     IndexViewWebAppBot,
     IndexViewExample
 )
@@ -30,14 +35,16 @@ urlpatterns = [
 
     path('advertisement/', AdsListCreateAPIView.as_view()),
     path('advertisement/<int:pk>/', AdsRetrieveDestroyAPIView.as_view()),
-
     path('advertisement/<int:pk>/update/', AdvertisementPatchView.as_view()),
-
     path('advertisement_delete/', AdvertisementDeleteView.as_view()),
-    # path('advertisement_patch/<int:pk>/', AdvertisementUpdateView.as_view()),
-
     path('advertisement_chat_id/', AdsUpdateByGroupId.as_view()),
-    
+
+    path('usefulcategory/', UsefulCategoryListAPIView.as_view()),
+    path('usefulcategory/<int:pk>/', UsefulSubCategoryView.as_view()),
+
+    path('usefulcategory/<int:pk>/usefulcatalog/', UsefulCatalogAPIView.as_view()),
+    path('usefulcatalog/<int:pk>/', UsefulCatalogDetailAPIView.as_view()),
+
     path("get_months/", get_months, name="get-months"),
     path("get_days/<int:month>", get_days, name="get-days"),
     path("get_groups_products/<int:month>/<int:day>/", get_products_len_in_a_day_by_groups, name="get-groups-products"),

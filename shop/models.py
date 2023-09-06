@@ -116,8 +116,9 @@ class UsefulCatalog(models.Model):
     name     = models.CharField(max_length=200)
     link     = models.CharField(max_length=200, blank=True, unique=True)
     type     = models.CharField(max_length=20, choices=TYPE)
-    category = models.ForeignKey(UsefulCategory, on_delete=models.CASCADE, related_name='useful_category', blank=True)
+    category = models.ForeignKey(UsefulCategory, on_delete=models.CASCADE, related_name='useful_catalogs', blank=True)
 
     class Meta:
         verbose_name=_("Foydali manba") #('Полезный каталог')
         verbose_name_plural=_("Foydali manbalar") #('Полезные каталоги')
+

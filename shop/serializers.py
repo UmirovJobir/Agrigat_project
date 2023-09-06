@@ -4,7 +4,9 @@ from .models import (
     Advertisement,
     BotUser,
     AdsUser,
-    TelegramGroupChannel
+    TelegramGroupChannel,
+    UsefulCategory,
+    UsefulCatalog
 )
 
 
@@ -50,4 +52,27 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = AdsCategory
         fields = 'id', 'name', 'products'
+
+
+class UsefulCategorySerializer(serializers.ModelSerializer):
+    usefulcatalogs = serializers.SerializerMethodField('usefulcatalog_len')
+
+    def usefulcatalog_len(self, obj):
+        count = 0
+        if obj.useful_subcategories.all():
+            for subcat in obj.useful_subcategories.all():
+                count += subcat.useful_catalogs.all().count()
+        else:
+            count += obj.useful_catalogs.all().count()
+        return count
+    
+    class Meta:
+        model = UsefulCategory
+        fields = 'id', 'name', 'usefulcatalogs'
+
+
+class UsefulCatalogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UsefulCatalog
+        fields = ['id', 'name', 'link', 'type', 'category']
 

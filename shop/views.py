@@ -15,13 +15,17 @@ from .models import (
     AdsCategory, 
     Advertisement,  
     TelegramGroupChannel,
+    UsefulCategory,
+    UsefulCatalog,
 )
 from .serializers import (
     BotUserSerializer,
     AdsUserSerializer,
     CategorySerializer, 
     AdsSerializer,
-    GroupChannelSerializer
+    GroupChannelSerializer,
+    UsefulCategorySerializer,
+    UsefulCatalogSerializer
 )
 
 def get_query_by_header(self, queryset):
@@ -45,12 +49,10 @@ class ParentCategoryView(generics.ListAPIView):
     queryset = AdsCategory.objects.all().select_related('parent')
     serializer_class = CategorySerializer
 
-    def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset().filter(parent=None)
+    def get_queryset(self):
+        queryset = AdsCategory.objects.filter(parent=None).select_related('parent')
         queryset = get_query_by_header(self, queryset)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return queryset
 
 
 class SubCategoryView(generics.RetrieveAPIView):
@@ -59,11 +61,11 @@ class SubCategoryView(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk')
-        parent_category_name = get_query_by_header(self, self.get_queryset().get(id=pk).name)
+        parent_category = get_query_by_header(self, self.get_queryset().get(id=pk))
         subcategories = get_query_by_header(self, self.get_queryset().filter(parent=pk))
         serializer = self.get_serializer(subcategories, many=True)
         return Response({"parent_category_id": pk,
-                         "parent_category_name": parent_category_name,  
+                         "parent_category_name": parent_category.name,  
                          "subcategories": serializer.data,})
 
    
@@ -202,6 +204,43 @@ class AdsUpdateByGroupId(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class UsefulCategoryListAPIView(generics.ListAPIView):
+    queryset = UsefulCategory.objects.all().select_related('parent')
+    serializer_class = UsefulCategorySerializer
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset().filter(parent=None)
+        queryset = get_query_by_header(self, queryset)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+
+class UsefulSubCategoryView(generics.RetrieveAPIView):
+    queryset = UsefulCategory.objects.all().select_related('parent')
+    serializer_class = UsefulCategorySerializer
+
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+        parent_usefulcategory = get_query_by_header(self, self.get_queryset().get(id=pk))
+        subcategories = get_query_by_header(self, self.get_queryset().filter(parent=pk))
+        serializer = self.get_serializer(subcategories, many=True)
+        return Response({"parent_usefulcategory_id": pk,
+                         "parent_usefulcategory_name": parent_usefulcategory.name,  
+                         "usefulsubcategories": serializer.data,})
+
+
+class UsefulCatalogAPIView(APIView):
+    def get(self, request, pk):
+        catalogs = UsefulCatalog.objects.filter(category=pk)
+        serializer  = UsefulCatalogSerializer(catalogs, many=True)
+        return Response(serializer.data)
+
+
+class UsefulCatalogDetailAPIView(generics.RetrieveAPIView):
+    queryset = UsefulCatalog.objects.all().select_related('category')
+    serializer_class = UsefulCatalogSerializer
 
 
 #webappbot
