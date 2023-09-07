@@ -130,7 +130,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = 'uz'
 
 TIME_ZONE = 'Asia/Tashkent'
 
@@ -146,12 +145,11 @@ LANGUAGES = (
     ('ru', 'Russian'),
 )
 
+LANGUAGE_CODE = 'uz'
+
 LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale'),
 ]
-
-MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz'
-MODELTRANSLATION_LANGUAGES = ('uz','kk','ru')
 
 
 # Static files (CSS, JavaScript, Images)
@@ -167,11 +165,6 @@ MEDIA_ROOT = BASE_DIR / 'media/'
 ADMINS = (
     ('admin', 'jobirumirovmoliya@gmail.com'),
 )
-
-# REST_FRAMEWORK = {
-#     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-#     'PAGE_SIZE': 10
-# }
 
 
 ADMIN_REORDER = (

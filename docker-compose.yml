@@ -1,19 +1,6 @@
 version: '3.3'
 
 services:
-  django:
-    build: .
-    restart: always
-    container_name: django
-    volumes:
-      - .:/app
-    ports:
-      - 8000:8000
-    depends_on:
-      - pgdb
-    env_file:
-      - .env
-
   pgdb:
     restart: always
     image: postgres:latest
@@ -23,7 +10,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=123
     ports:
-      - 5010:5432
+      - "5432:5432"
     volumes:
       - ./data:/var/lib/postgresql/data
 
@@ -37,7 +24,20 @@ services:
         PGADMIN_DEFAULT_EMAIL: admin@example.com
         PGADMIN_DEFAULT_PASSWORD: ubuntu     
       ports:
-        - 80:80
+        - "80:80"
+
+  django:
+    build: .
+    restart: always
+    container_name: django
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - pgdb
+    env_file:
+      - .env
 
 volumes:
     django:
