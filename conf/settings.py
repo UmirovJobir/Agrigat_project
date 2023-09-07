@@ -56,9 +56,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.middleware.locale.LocaleMiddleware', #language
     'debug_toolbar.middleware.DebugToolbarMiddleware', #debug_toolbar
-    # 'admin_reorder.middleware.ModelAdminReorder', #admin_reorder
     'conf.middleware.ModelAdminReorderWithNav', #admin_reorder
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -162,10 +160,6 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "staticfiles")]
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media/'
 
-ADMINS = (
-    ('admin', 'jobirumirovmoliya@gmail.com'),
-)
-
 
 ADMIN_REORDER = (
     {'app': 'auth', 'label': 'Admin',
@@ -191,3 +185,35 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
     'django.template.loaders.filesystem.Loader',
 )
+
+
+LOGFILE_NAME = BASE_DIR / "log.txt"
+LOGFILE_SIZE = 1 * 1024 * 1024
+LOGFILE_COUNT = 3
+
+LOGGING = {
+    'version': 1,
+    "disable_existing_loggers":False,
+    "formatters": {
+        "verbose": {
+            "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "logfile": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOGFILE_NAME,
+            "maxBytes": LOGFILE_SIZE,
+            "backupCount": LOGFILE_COUNT,
+            "formatter": "verbose",
+        },
+    },
+    "root":{
+        "handlers": ["console", "logfile"],
+        "level": "INFO",
+    },   
+}

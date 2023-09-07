@@ -1,0 +1,17 @@
+2023-09-07 17:58:04,406 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-09-07 17:59:55,406 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-09-07 18:00:29,957 [INFO] django.utils.autoreload: D:\Jobir\Project\Agrigate\Agrigat_project\conf\settings.py changed, reloading.
+2023-09-07 18:00:30,807 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-09-07 18:00:35,069 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-09-07 18:01:48,820 [INFO] django.utils.autoreload: D:\Jobir\Project\Agrigate\Agrigat_project\conf\settings.py changed, reloading.
+2023-09-07 18:01:49,616 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-09-07 18:01:51,352 [INFO] django.utils.autoreload: D:\Jobir\Project\Agrigate\Agrigat_project\conf\settings.py changed, reloading.
+2023-09-07 18:01:52,147 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-09-07 18:02:10,302 [INFO] django.utils.autoreload: D:\Jobir\Project\Agrigate\Agrigat_project\conf\settings.py changed, reloading.
+2023-09-07 18:02:11,173 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-09-07 18:02:16,901 [INFO] django.utils.autoreload: D:\Jobir\Project\Agrigate\Agrigat_project\conf\settings.py changed, reloading.
+2023-09-07 18:02:17,763 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-09-07 18:02:21,585 [INFO] django.utils.autoreload: D:\Jobir\Project\Agrigate\Agrigat_project\conf\settings.py changed, reloading.
+2023-09-07 18:02:22,428 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-09-07 18:02:37,152 [INFO] django.utils.autoreload: D:\Jobir\Project\Agrigate\Agrigat_project\conf\settings.py changed, reloading.
+2023-09-07 18:02:37,993 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
