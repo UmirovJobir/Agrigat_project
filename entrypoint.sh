@@ -11,7 +11,7 @@ then
     echo "PostgreSQL started"
 fi
 
-sleep 10
+sleep 2
 
 echo "Apply database migrations"
 python3 manage.py makemigrations
