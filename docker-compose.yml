@@ -6,11 +6,11 @@ services:
     container_name: django
     build: 
         dockerfile: ./Dockerfile
-    command: 
-      - gunicorn 
-      - conf.wsgi:application 
-      - --bind
-      - 0.0.0.0:8000
+    # command: 
+    #   - gunicorn 
+    #   - conf.wsgi:application 
+    #   - --bind
+    #   - 0.0.0.0:8000
     ports:
       - "8000:8000"
     depends_on:
@@ -19,7 +19,7 @@ services:
       - .env
     volumes:
       - .:/app
-      
+
   pgdb:
     restart: always
     image: postgres:latest
