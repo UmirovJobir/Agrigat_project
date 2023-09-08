@@ -8,4 +8,9 @@ COPY . .
 
 RUN pip install -r requirements.txt
 
-CMD  [ "gunicorn", "conf.wsgi:application", "--bind", "0.0.0.0:8000" ]
+RUN chmod +x entrypoint.sh
+
+EXPOSE 8000
+
+COPY entrypoint.sh .
+ENTRYPOINT ["sh", "entrypoint.sh"]
