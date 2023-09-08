@@ -26,7 +26,7 @@ services:
       ports:
         - "80:80"
 
-  django:
+  app:
     restart: always
     container_name: django
     build: 
@@ -49,8 +49,3 @@ services:
       options:
         max-file: "3"
         max-size: "200"
-
-
-volumes:
-    django:
-    pgdb:
