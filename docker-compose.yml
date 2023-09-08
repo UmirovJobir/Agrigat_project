@@ -27,17 +27,29 @@ services:
         - "80:80"
 
   django:
-    build: .
     restart: always
     container_name: django
-    volumes:
-      - .:/app
+    build: 
+        dockerfile: ./Dockerfile
+    command: 
+      - gunicorn 
+      - mysite.wsgi:application 
+      - --bind
+      - 0.0.0.0:8000
     ports:
       - "8000:8000"
     depends_on:
       - pgdb
     env_file:
       - .env
+    volumes:
+      - .:/app
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "3"
+        max-size: "200"
+
 
 volumes:
     django:
