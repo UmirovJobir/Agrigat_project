@@ -1,0 +1,41 @@
+version: '3.3'
+
+services:
+  web:
+    restart: always
+    container_name: web
+    command: gunicorn conf.wsgi:application --bind 0.0.0.0:8000
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - pgdb
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+
+  pgdb:
+    restart: always
+    image: postgres:latest
+    container_name: pgdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env.prod.db
+
+  # pgadmin:
+  #     restart: always
+  #     image: dpage/pgadmin4:latest
+  #     container_name: pgadmin
+  #     depends_on:
+  #       - pgdb
+  #     environment:
+  #       PGADMIN_DEFAULT_EMAIL: admin@example.com
+  #       PGADMIN_DEFAULT_PASSWORD: ubuntu     
+  #     ports:
+  #       - "80:80"
+
+volumes:
+  postgres_data:
+
